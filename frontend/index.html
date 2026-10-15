@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrimeVision AI – Intelligent Multimodal Forensic Analysis Platform</title>
+  <meta name="description" content="Advanced multimodal forensic intelligence platform for crime scene reconstruction, 3D spatial mapping, audio transcription, video timelines, and Groq-powered reasoning.">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Three.js for 3D Scene Reconstruction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dark-theme">
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-shield">
+        <i class="fa-solid fa-fingerprint"></i>
+      </div>
+      <div class="header-titles">
+        <h1 class="platform-title">CrimeVision AI – Intelligent Multimodal Forensic Analysis Platform</h1>
+        <span class="sub-badge"><i class="fa-solid fa-shield-halved"></i> Automated Forensic Decision Support System</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="system-status">
+        <span class="status-dot"></span>
+        <span class="status-text" id="systemHealthText">AI Engine Ready</span>
+      </div>
+      <div class="mode-badge-pill" id="currentModeBadge">Mode: Image Analysis</div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-layout">
+    
+    <!-- LEFT SIDEBAR: Navigation & Upload Panel -->
+    <aside class="sidebar-panel">
+      <!-- Mode Selection Tabs -->
+      <div class="nav-section">
+        <div class="section-title">ANALYSIS MODES</div>
+        <div class="nav-buttons">
+          <button class="nav-btn active" id="navImageBtn" data-mode="image">
+            <i class="fa-regular fa-image"></i>
+            <span>Image Analysis</span>
+          </button>
+          <button class="nav-btn" id="navAudioBtn" data-mode="audio">
+            <i class="fa-solid fa-microphone-lines"></i>
+            <span>Audio Analysis</span>
+          </button>
+          <button class="nav-btn" id="navVideoBtn" data-mode="video">
+            <i class="fa-solid fa-video"></i>
+            <span>Video Analysis</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Upload Evidence Card -->
+      <div class="upload-card">
+        <div class="card-header">
+          <i class="fa-solid fa-file-arrow-up text-primary"></i>
+          <h3 id="uploadTitle">Upload Image</h3>
+        </div>
+
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" class="file-input" accept="image/*">
+          <div class="drop-content">
+            <div class="upload-icon-circle">
+              <i class="fa-solid fa-cloud-arrow-up" id="uploadIcon"></i>
+            </div>
+            <p class="drop-prompt" id="dropPrompt">Upload Image</p>
+            <p class="drop-sub" id="dropSub">Photos for 3D recovery (JPG, PNG)</p>
+          </div>
+        </div>
+
+        <!-- Selected File Status Info -->
+        <div class="file-status-pill hidden" id="fileStatusPill">
+          <i class="fa-solid fa-paperclip"></i>
+          <span class="file-name" id="fileNameDisplay">crime-scene-investigation.jpg</span>
+          <button class="remove-file-btn" id="removeFileBtn" title="Clear file">&times;</button>
+        </div>
+
+        <!-- Preloaded Benchmark Evidence Button -->
+        <button class="btn-preset" id="presetEvidenceBtn">
+          <i class="fa-solid fa-database"></i>
+          <span>Use Preloaded Evidence</span>
+        </button>
+
+        <!-- Start Processing Action Button -->
+        <button class="btn-primary" id="startProcessingBtn">
+          <i class="fa-solid fa-bolt-lightning"></i>
+          <span id="processBtnText">Start Processing</span>
+          <div class="spinner hidden" id="processSpinner"></div>
+        </button>
+      </div>
+
+      <!-- Evidence Quick Stats / Case Info -->
+      <div class="case-meta-card">
+        <div class="meta-row">
+          <span class="meta-label">Investigator</span>
+          <span class="meta-value">Rahul Rajak</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Inference Engine</span>
+          <span class="meta-value" id="engineInfo">RT-DETR + Groq Llama-3</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Session ID</span>
+          <span class="meta-value font-mono" id="currentSessionId">Ready</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER & RIGHT DYNAMIC VIEWPORTS -->
+    <section class="content-viewport">
+
+      <!-- ================= 1. IMAGE ANALYSIS VIEW ================= -->
+      <div class="mode-view active" id="imageView">
+        <div class="center-stage">
+          <!-- 3D Scene Reconstruction / 2D Canvas -->
+          <div class="stage-card">
+            <div class="stage-header">
+              <div class="stage-title">
+                <i class="fa-solid fa-cube text-primary"></i>
+                <span>3D Scene Reconstruction</span>
+              </div>
+              <div class="stage-controls">
+                <button class="stage-toggle-btn active" id="view3dToggle" title="Interactive 3D Mesh">3D Mesh</button>
+                <button class="stage-toggle-btn" id="view2dToggle" title="Annotated 2D Detection">2D Boxes</button>
+                <button class="icon-tool-btn" id="resetCameraBtn" title="Reset Camera View"><i class="fa-solid fa-rotate-right"></i></button>
+                <button class="icon-tool-btn" id="fullscreen3dBtn" title="Fullscreen"><i class="fa-regular fa-square"></i></button>
+              </div>
+            </div>
+
+            <!-- Viewport Container for Three.js & Image Overlay -->
+            <div class="viewport-canvas-container" id="canvas3dContainer">
+              <div id="threejsViewport" class="threejs-canvas"></div>
+              
+              <!-- 2D Image with Bounding Box Overlay (hidden by default until toggled) -->
+              <div id="imageAnnotatedView" class="image-2d-canvas hidden">
+                <img id="evidenceImagePreview" src="" alt="Crime Scene Evidence">
+                <div id="boundingBoxOverlay" class="box-overlay-layer"></div>
+              </div>
+
+              <!-- 3D HUD controls helper -->
+              <div class="hud-helper">
+                <span><i class="fa-solid fa-mouse"></i> Left Click: Orbit</span>
+                <span><i class="fa-solid fa-arrows-up-down-left-right"></i> Right Click: Pan</span>
+                <span><i class="fa-solid fa-circle-dot"></i> Scroll: Zoom</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Evidence Panel: Image Mode -->
+        <div class="right-panel">
+          <div class="panel-card">
+            <div class="panel-header">
+              <i class="fa-solid fa-clipboard-list text-primary"></i>
+              <h3>Evidence Analysis</h3>
+            </div>
+
+            <!-- AI Scene Summary -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-wand-magic-sparkles text-primary"></i> AI SCENE SUMMARY</div>
+              <div class="ai-summary-content" id="aiSceneSummaryBox">
+                <p class="summary-line"><strong>Summary Type:</strong> <span id="imageSummaryType">Crime Scene</span></p>
+                <p class="summary-line"><strong>Brief Description:</strong> <span id="imageBriefDesc">A male individual is observed lying on the floor, surrounded by a knife and restrained with tape.</span></p>
+              </div>
+            </div>
+
+            <!-- Visual Summary -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-eye text-primary"></i> VISUAL SUMMARY</div>
+              <p class="insight-text" id="imageVisualSummary">
+                A man laying on the floor with a knife and tape around him
+              </p>
+            </div>
+
+            <!-- Quick Metrics Grid (Objects, Persons, Weapons, Location) -->
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <i class="fa-solid fa-shapes metric-icon"></i>
+                <div class="metric-val" id="imgObjectsCount">9</div>
+                <div class="metric-title">Objects</div>
+              </div>
+              <div class="metric-box">
+                <i class="fa-solid fa-user-group metric-icon"></i>
+                <div class="metric-val" id="imgPersonsCount">1</div>
+                <div class="metric-title">Persons</div>
+              </div>
+              <div class="metric-box">
+                <i class="fa-solid fa-crosshairs metric-icon text-danger"></i>
+                <div class="metric-val text-danger" id="imgWeaponsCount">1</div>
+                <div class="metric-title">Weapons</div>
+              </div>
+              <div class="metric-box">
+                <i class="fa-solid fa-location-dot metric-icon text-success"></i>
+                <div class="metric-val" id="imgLocationName">office</div>
+                <div class="metric-title">Location</div>
+              </div>
+            </div>
+
+            <!-- Actions Detected -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-bolt text-warning"></i> ACTIONS DETECTED</div>
+              <div class="pill-tags" id="imageActionsTags">
+                <span class="tag-pill">lying down</span>
+              </div>
+            </div>
+
+            <!-- Evidence Facts -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-tags text-primary"></i> EVIDENCE FACTS</div>
+              <p class="insight-text font-mono" id="imageEvidenceFacts">
+                laptop, diningtable, chair, Human, sofa, cup, knife, tape
+              </p>
+            </div>
+
+            <!-- AI Application Scenarios -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-lightbulb text-info"></i> AI APPLICATION SCENARIOS</div>
+              <div class="scenarios-list" id="imageScenariosList">
+                <div class="scenario-card">
+                  <strong>Scenario 1:</strong> The man was attacked by an unknown assailant while working late in the office, and the perpetrator used the knife to inflict fatal wounds before fleeing the scene.
+                </div>
+                <div class="scenario-card">
+                  <strong>Scenario 2:</strong> The individual, feeling overwhelmed by stress, attempted to harm himself with the knife but was unable to complete the act and lies there, awaiting help, with the tape possibly being used in a misguided attempt to treat the wound.
+                </div>
+                <div class="scenario-card">
+                  <strong>Scenario 3:</strong> The person staged a crime scene to mislead investigators, strategically placing the knife and tape to create the illusion of a violent struggle, but ultimately fell asleep or lost consciousness on the floor.
+                </div>
+              </div>
+            </div>
+
+            <!-- Download PDF Report Button -->
+            <button class="btn-pdf" id="downloadImagePdfBtn">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Download PDF Report</span>
+            </button>
+
+            <!-- Ask AI about this Image -->
+            <div class="chat-section">
+              <div class="chat-header">
+                <i class="fa-solid fa-robot text-primary"></i>
+                <span>Ask AI about this Image</span>
+              </div>
+              <div class="chat-history" id="imageChatHistory">
+                <div class="chat-msg ai-msg">
+                  <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                  <div class="msg-body">
+                    The scene summary is: "A male individual is observed lying on the floor, surrounded by a knife and restrained with tape." The location is an office. One person is detected, and bloodstains are present.
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <input type="text" id="imageChatInput" placeholder="Ask a question about the evidence..." autocomplete="off">
+                <button class="chat-send-btn" id="imageChatSendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 2. AUDIO ANALYSIS VIEW ================= -->
+      <div class="mode-view" id="audioView">
+        <div class="center-stage">
+          <!-- Live Transcript Card -->
+          <div class="stage-card mb-4">
+            <div class="stage-header">
+              <div class="stage-title">
+                <i class="fa-solid fa-file-lines text-primary"></i>
+                <span>Live Transcript</span>
+              </div>
+              <div class="audio-controls-row">
+                <audio id="audioPlayer" controls class="custom-audio-player" preload="metadata">
+                  <source src="/data/uploads/audio/sample_robbery_witness.mp3" type="audio/mpeg">
+                  <source src="/data/uploads/audio/sample_robbery_witness.wav" type="audio/wav">
+                  Your browser does not support audio playback.
+                </audio>
+              </div>
+            </div>
+            <div class="transcript-box" id="liveTranscriptBox">
+              <p class="transcript-text" id="audioTranscriptText">
+                I was walking down Maple Avenue around 8 p.m. when I noticed the lights still on inside the jewelry store on the corner. Suddenly, I saw two masked individuals rush out of the store carrying bags. One of them dropped a necklace on the sidewalk. They jumped into a dark car parked nearby and sped off before anyone could react. I remember hearing the store alarm blaring right after they drove away.
+              </p>
+            </div>
+          </div>
+
+          <!-- AI Intelligence Report Card -->
+          <div class="stage-card">
+            <div class="stage-header">
+              <div class="stage-title">
+                <i class="fa-solid fa-brain text-primary"></i>
+                <span>AI Intelligence Report</span>
+              </div>
+              <div class="badges-row">
+                <span class="crime-badge danger" id="audioCrimeBadge">ROBBERY</span>
+                <span class="crime-badge success" id="audioLocationBadge">STORE</span>
+              </div>
+            </div>
+            
+            <div class="intelligence-summary-box">
+              <div class="ai-summary-pill"><i class="fa-solid fa-quote-left"></i> AI SUMMARY</div>
+              <p class="summary-paragraph" id="audioAiSummary">
+                "The witness reported observing two masked individuals exiting the jewelry store on Maple Avenue around 8 p.m., fleeing the scene in a dark car after dropping a necklace, and speeding away as the store's alarm sounded."
+              </p>
+            </div>
+
+            <!-- Transcripts & Translations Multi-Tab -->
+            <div class="translations-container">
+              <div class="translations-header">
+                <i class="fa-solid fa-language text-warning"></i>
+                <span>Transcripts & Translations:</span>
+              </div>
+              <div class="lang-tabs">
+                <button class="lang-tab active" data-lang="english">English</button>
+                <button class="lang-tab" data-lang="hindi">Hindi</button>
+                <button class="lang-tab" data-lang="telugu">Telugu</button>
+                <button class="lang-tab" data-lang="french">French</button>
+              </div>
+              <div class="translation-content-box">
+                <p id="translationOutputText" class="translation-text">
+                  I was walking down Maple Avenue around 8 p.m. when I noticed the lights still on inside the jewelry store on the corner. Suddenly, I saw two masked individuals rush out of the store carrying bags. One of them dropped a necklace on the sidewalk. They jumped into a dark car parked nearby and sped off before anyone could react. I remember hearing the store alarm blaring right after they drove away.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Audio Timeline & Chat -->
+        <div class="right-panel">
+          <div class="panel-card">
+            <div class="panel-header">
+              <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+              <h3>AI Generated Crime Event Timeline</h3>
+            </div>
+            <p class="panel-subtitle">From witness audio statement</p>
+
+            <!-- Audio Timeline Table -->
+            <div class="timeline-table-wrapper">
+              <table class="timeline-table" id="audioTimelineTable">
+                <thead>
+                  <tr>
+                    <th style="width: 25%">Time</th>
+                    <th>Event</th>
+                  </tr>
+                </thead>
+                <tbody id="audioTimelineBody">
+                  <tr>
+                    <td class="time-col">00:00</td>
+                    <td>witness noticed lights on inside jewelry store</td>
+                  </tr>
+                  <tr>
+                    <td class="time-col">00:07</td>
+                    <td>two masked individuals rushed out of store</td>
+                  </tr>
+                  <tr>
+                    <td class="time-col">00:12</td>
+                    <td>suspect dropped necklace on sidewalk</td>
+                  </tr>
+                  <tr>
+                    <td class="time-col">00:15</td>
+                    <td>suspects sped off in car</td>
+                  </tr>
+                  <tr>
+                    <td class="time-col">00:21</td>
+                    <td>store alarm blaring</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Download PDF Report -->
+            <button class="btn-pdf" id="downloadAudioPdfBtn">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Download PDF Report</span>
+            </button>
+
+            <!-- Ask AI about this Audio -->
+            <div class="chat-section">
+              <div class="chat-header">
+                <i class="fa-solid fa-robot text-primary"></i>
+                <span>Ask AI about this Audio</span>
+              </div>
+              <div class="chat-history" id="audioChatHistory">
+                <div class="chat-msg ai-msg">
+                  <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                  <div class="msg-body">
+                    I've analyzed the audio transcript and timeline. Ask me anything about the events detected!
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <input type="text" id="audioChatInput" placeholder="Ask about suspect, time, location..." autocomplete="off">
+                <button class="chat-send-btn" id="audioChatSendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 3. VIDEO ANALYSIS VIEW ================= -->
+      <div class="mode-view" id="videoView">
+        <div class="center-stage">
+          <!-- Video Evidence Player Card -->
+          <div class="stage-card mb-4">
+            <div class="stage-header">
+              <div class="stage-title">
+                <i class="fa-solid fa-video text-primary"></i>
+                <span>Video Evidence</span>
+              </div>
+              <div class="video-meta-tag font-mono" id="videoDurationTag">0:00 / 0:21</div>
+            </div>
+
+            <div class="video-player-container">
+              <video id="surveillanceVideoPlayer" class="surveillance-video" controls playsinline preload="metadata">
+                <source src="/data/uploads/video/sample_surveillance_store.mp4" type="video/mp4">
+                Your browser does not support video playback.
+              </video>
+              <div class="video-hud-overlay">
+                <span class="rec-badge"><i class="fa-solid fa-circle"></i> CAM-04 REC</span>
+                <span class="hud-location">SHOPPING MALL CORRIDOR</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Scene Intelligence & Classification Card -->
+          <div class="stage-card">
+            <div class="stage-header">
+              <div class="classification-pill-badge" id="videoClassificationBadge">
+                NORMAL ACTIVITY (90%)
+              </div>
+              <span class="classification-reason" id="videoClassificationReason">Reason: No explicit crime committed</span>
+            </div>
+
+            <!-- AI Visual Summary -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-film text-primary"></i> AI Visual Summary</div>
+              <p class="insight-text leading-relaxed" id="videoVisualSummaryText">
+                A man and a woman are seen entering and moving within a store located in a shopping mall, as captured by surveillance footage over a period of 11 seconds. The video sequences show the individuals navigating the store, with no explicit depiction of a crime being committed during this time frame.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Video Scene Intelligence & Second-by-Second Event Timeline -->
+        <div class="right-panel">
+          <div class="panel-card">
+            <div class="panel-header">
+              <i class="fa-solid fa-layer-group text-primary"></i>
+              <h3>Scene Intelligence</h3>
+            </div>
+
+            <!-- Intelligence Details -->
+            <div class="scene-intel-grid">
+              <div class="intel-item">
+                <span class="intel-label">Objects Detect</span>
+                <span class="intel-val" id="videoObjectsDetect">refrigerator, handbag, orange, backpack, donut</span>
+              </div>
+              <div class="intel-item">
+                <span class="intel-label">People Count</span>
+                <span class="intel-val" id="videoPeopleCount">2</span>
+              </div>
+              <div class="intel-item">
+                <span class="intel-label">Location</span>
+                <span class="intel-val" id="videoLocation">Shopping mall store</span>
+              </div>
+              <div class="intel-item">
+                <span class="intel-label">Action</span>
+                <span class="intel-val" id="videoAction">none</span>
+              </div>
+            </div>
+
+            <!-- Event Timeline (Second by Second) -->
+            <div class="timeline-section-header">
+              <div class="timeline-title-row">
+                <i class="fa-solid fa-timeline text-primary"></i>
+                <h4>Event Timeline</h4>
+              </div>
+              <span class="timeline-tip">Click any second to jump video</span>
+            </div>
+
+            <div class="timeline-table-wrapper video-timeline-scroll">
+              <table class="timeline-table" id="videoTimelineTable">
+                <thead>
+                  <tr>
+                    <th style="width: 25%">Time</th>
+                    <th>Event</th>
+                  </tr>
+                </thead>
+                <tbody id="videoTimelineBody">
+                  <tr data-sec="0">
+                    <td class="time-col">00:00</td>
+                    <td>A man is in a store with multiple refrigerators and handbags.</td>
+                  </tr>
+                  <tr data-sec="1">
+                    <td class="time-col">00:01</td>
+                    <td>A person is in the middle of a store with other people and refrigerators.</td>
+                  </tr>
+                  <tr data-sec="2">
+                    <td class="time-col">00:02</td>
+                    <td>A store in a shopping mall has people and refrigerators.</td>
+                  </tr>
+                  <tr data-sec="3">
+                    <td class="time-col">00:03</td>
+                    <td>A person is seen among multiple people and refrigerators in a store.</td>
+                  </tr>
+                  <tr data-sec="5">
+                    <td class="time-col">00:05</td>
+                    <td>A store has people, handbags, and refrigerators.</td>
+                  </tr>
+                  <tr data-sec="6">
+                    <td class="time-col">00:06</td>
+                    <td>A shopper is in a store with backpacks and refrigerators.</td>
+                  </tr>
+                  <tr data-sec="7">
+                    <td class="time-col">00:07</td>
+                    <td>A store in a shopping area has people, backpacks, and handbags.</td>
+                  </tr>
+                  <tr data-sec="8">
+                    <td class="time-col">00:08</td>
+                    <td>A woman is in a store with multiple handbags and refrigerators.</td>
+                  </tr>
+                  <tr data-sec="10">
+                    <td class="time-col">00:10</td>
+                    <td>A store has people and a plethora of refrigerators.</td>
+                  </tr>
+                  <tr data-sec="11">
+                    <td class="time-col">00:11</td>
+                    <td>A shop in a mall has people and refrigerators.</td>
+                  </tr>
+                  <tr data-sec="12">
+                    <td class="time-col">00:12</td>
+                    <td>People and refrigerators are present.</td>
+                  </tr>
+                  <tr data-sec="13">
+                    <td class="time-col">00:13</td>
+                    <td>People and refrigerators are still visible.</td>
+                  </tr>
+                  <tr data-sec="14">
+                    <td class="time-col">00:14</td>
+                    <td>Multiple people and handbags are seen with refrigerators.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Download PDF Report -->
+            <button class="btn-pdf" id="downloadVideoPdfBtn">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Download PDF Report</span>
+            </button>
+
+            <!-- Ask AI about the Video Chatbot -->
+            <div class="chat-section">
+              <div class="chat-header">
+                <i class="fa-solid fa-robot text-primary"></i>
+                <span>Ask AI about the Video</span>
+              </div>
+              <div class="chat-history" id="videoChatHistory">
+                <div class="chat-msg ai-msg">
+                  <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                  <div class="msg-body">
+                    I've analyzed the video scene and timeline. Ask me anything about the actions or objects detected!
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <input type="text" id="videoChatInput" placeholder="e.g. who was there at 5s?" autocomplete="off">
+                <button class="chat-send-btn" id="videoChatSendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/scene_3d.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/chat_handler.js"></script>
+  <script src="js/upload_panel.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
