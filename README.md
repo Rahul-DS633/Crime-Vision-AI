@@ -3,7 +3,7 @@
 **CrimeVision AI** is an advanced forensic intelligence platform designed to automate crime scene reconstruction and digital evidence analysis using multimodal artificial intelligence. By integrating **image, video, and audio evidence**, the system identifies people, weapons, and objects, analyzes tactical actions, transcribes multilingual witness statements, and generates unified chronological forensic timelines with 3D spatial scene reconstruction.
 
 ---
-
+.
 ## 🏛️ System Architecture
 
 ```mermaid
