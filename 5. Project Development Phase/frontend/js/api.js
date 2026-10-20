@@ -98,6 +98,29 @@ class API {
       method: 'POST',
       body: formData
     });
+  }
+
+  /**
+   * OpenCV Video Detection & Evidence Prediction API
+   * Predicts objects, people, vehicles, 2D boxes, 3D trajectories, and timeline
+   */
+  static async opencvPredictVideo(fileOrPath) {
+    if (typeof fileOrPath === 'string') {
+      const response = await fetch(`${API_BASE_URL}/video/opencv-predict`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ video_path: fileOrPath })
+      });
+      return await response.json();
+    }
+    const formData = new FormData();
+    if (fileOrPath instanceof File) {
+      formData.append('file', fileOrPath);
+    }
+    const response = await fetch(`${API_BASE_URL}/video/opencv-predict`, {
+      method: 'POST',
+      body: formData
+    });
     return await response.json();
   }
 

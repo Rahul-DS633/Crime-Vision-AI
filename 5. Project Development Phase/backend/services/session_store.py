@@ -75,6 +75,35 @@ class SessionStore:
 
         return None
 
+    def get_latest_session(self, mode: Optional[str] = None) -> Optional[dict]:
+        """
+        Retrieves the most recent session data, optionally filtered by mode.
+        """
+        if not self._store:
+            return None
+
+        # Sort sessions by timestamp descending
+        sorted_entries = sorted(
+            self._store.values(),
+            key=lambda x: x.get("timestamp", 0),
+            reverse=True
+        )
+
+        if not mode:
+            return sorted_entries[0].get("data", {}) if sorted_entries else None
+
+        for entry in sorted_entries:
+            data = entry.get("data", {})
+            if mode == "video" and ("video_path" in data or "timeline" in data or "spatial_3d_trajectory" in data):
+                return data
+            if mode == "audio" and ("audio_path" in data or "transcript" in data):
+                return data
+            if mode == "image" and ("image_path" in data or "detections" in data):
+                return data
+
+        # Fallback to absolute latest
+        return sorted_entries[0].get("data", {}) if sorted_entries else None
+
     def update_session(self, session_id: str, new_data: dict) -> bool:
         """
         Updates session context with additional data.

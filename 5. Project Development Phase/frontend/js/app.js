@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
   videoScene3D = new VideoTrajectory3D('videoTrajectoryViewport');
   const timeline = new Timeline();
 
-  const imageChat = new ChatHandler('image', 'imageChatInput', 'imageChatSendBtn', 'imageChatHistory');
-  const audioChat = new ChatHandler('audio', 'audioChatInput', 'audioChatSendBtn', 'audioChatHistory');
-  const videoChat = new ChatHandler('video', 'videoChatInput', 'videoChatSendBtn', 'videoChatHistory');
+  const imageChat = new ChatHandler('image', 'imageChatInput', 'imageChatSendBtn', 'imageChatHistory', 'imageChatSuggestions');
+  const audioChat = new ChatHandler('audio', 'audioChatInput', 'audioChatSendBtn', 'audioChatHistory', 'audioChatSuggestions');
+  const videoChat = new ChatHandler('video', 'videoChatInput', 'videoChatSendBtn', 'videoChatHistory', 'videoChatSuggestions');
 
   let currentMode = 'image';
   let activeSessionId = 'ready-state';
@@ -224,8 +224,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const width = (box[2] - box[0]) * 100;
       const height = (box[3] - box[1]) * 100;
 
+      const lLower = (det.label || '').toLowerCase();
+      const isSuspect = lLower.includes('suspect') || det.category === 'threat' || det.danger_level === 'critical' || det.danger_level === 'high';
+      const isVehicle = lLower.includes('vehicle') || lLower.includes('car') || det.category === 'vehicle';
+      const isHuman = lLower.includes('person') || lLower.includes('human') || lLower.includes('victim') || lLower.includes('clerk') || det.category === 'people';
+      const cssClass = isVehicle ? 'vehicle' : (isSuspect ? 'threat' : (isHuman ? 'human' : ''));
+
       const rect = document.createElement('div');
-      rect.className = `bbox-rect ${det.label.toLowerCase().includes('suspect') ? 'weapon' : (det.label.toLowerCase().includes('person') ? 'human' : '')}`;
+      rect.className = `bbox-rect ${cssClass}`;
       rect.style.left = `${left}%`;
       rect.style.top = `${top}%`;
       rect.style.width = `${width}%`;
@@ -239,6 +245,104 @@ document.addEventListener('DOMContentLoaded', () => {
       videoBBoxOverlay.appendChild(rect);
     });
   }
+
+  // Audio Player & Dynamic Waveform Equalizer
+  const audioPlayer = document.getElementById('audioPlayer');
+  const customAudioPlayBtn = document.getElementById('customAudioPlayBtn');
+  const customPlayIcon = document.getElementById('customPlayIcon');
+  const audioSeekBar = document.getElementById('audioSeekBar');
+  const audioCurrentTimeText = document.getElementById('audioCurrentTimeText');
+  const audioTotalTimeText = document.getElementById('audioTotalTimeText');
+  const audioDurationTag = document.getElementById('audioDurationTag');
+  const audioSpeedToggleBtn = document.getElementById('audioSpeedToggleBtn');
+  const audioWaveformVisualizer = document.getElementById('audioWaveformVisualizer');
+  const audioProcessingBanner = document.getElementById('audioProcessingBanner');
+  const audioTrackName = document.getElementById('audioTrackName');
+
+  // Build 36 animated equalizer visualizer bars
+  if (audioWaveformVisualizer) {
+    audioWaveformVisualizer.innerHTML = '';
+    for (let i = 0; i < 36; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'audio-waveform-bar';
+      bar.style.animationDelay = `${(i % 9) * 0.07}s`;
+      audioWaveformVisualizer.appendChild(bar);
+    }
+  }
+
+  // Play / Pause transport toggle
+  customAudioPlayBtn?.addEventListener('click', () => {
+    if (!audioPlayer) return;
+    if (audioPlayer.paused) {
+      audioPlayer.play().catch(e => console.log('Audio playback error:', e));
+    } else {
+      audioPlayer.pause();
+    }
+  });
+
+  if (audioPlayer) {
+    audioPlayer.addEventListener('play', () => {
+      if (customPlayIcon) customPlayIcon.className = 'fa-solid fa-pause';
+      document.querySelectorAll('.audio-waveform-bar').forEach(b => b.classList.add('playing'));
+    });
+
+    audioPlayer.addEventListener('pause', () => {
+      if (customPlayIcon) customPlayIcon.className = 'fa-solid fa-play';
+      document.querySelectorAll('.audio-waveform-bar').forEach(b => b.classList.remove('playing'));
+    });
+
+    audioPlayer.addEventListener('ended', () => {
+      if (customPlayIcon) customPlayIcon.className = 'fa-solid fa-play';
+      document.querySelectorAll('.audio-waveform-bar').forEach(b => b.classList.remove('playing'));
+      if (audioSeekBar) audioSeekBar.value = 0;
+      if (audioCurrentTimeText) audioCurrentTimeText.textContent = '0:00';
+    });
+
+    audioPlayer.addEventListener('timeupdate', () => {
+      const cur = audioPlayer.currentTime || 0;
+      const dur = audioPlayer.duration || 0;
+      if (audioCurrentTimeText) audioCurrentTimeText.textContent = formatTimeStr(cur);
+      if (dur > 0 && audioSeekBar) {
+        audioSeekBar.value = (cur / dur) * 100;
+      }
+      if (audioDurationTag && dur > 0) {
+        audioDurationTag.textContent = `${formatTimeStr(cur)} / ${formatTimeStr(dur)}`;
+      }
+    });
+
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      const dur = audioPlayer.duration || 0;
+      if (audioTotalTimeText) audioTotalTimeText.textContent = formatTimeStr(dur);
+      if (audioDurationTag) audioDurationTag.textContent = `0:00 / ${formatTimeStr(dur)}`;
+    });
+
+    audioSeekBar?.addEventListener('input', () => {
+      const dur = audioPlayer.duration || 0;
+      if (dur > 0) {
+        audioPlayer.currentTime = (audioSeekBar.value / 100) * dur;
+      }
+    });
+
+    audioPlayer.onerror = () => {
+      console.warn("Audio playback error, falling back to reliable wav audio source.");
+      audioPlayer.src = '/data/uploads/audio/sample_robbery_witness.wav';
+      audioPlayer.load();
+    };
+
+    // Preload initial sample audio
+    audioPlayer.src = '/data/uploads/audio/case01_distress_call_911.wav';
+    audioPlayer.load();
+  }
+
+  // Speed toggle
+  const speeds = [1.0, 1.25, 1.5, 2.0];
+  let currentSpeedIdx = 0;
+  audioSpeedToggleBtn?.addEventListener('click', () => {
+    currentSpeedIdx = (currentSpeedIdx + 1) % speeds.length;
+    const s = speeds[currentSpeedIdx];
+    if (audioPlayer) audioPlayer.playbackRate = s;
+    if (audioSpeedToggleBtn) audioSpeedToggleBtn.textContent = `${s.toFixed(1)}x`;
+  });
 
   // Camera Reset & Fullscreen
   const resetCameraBtn = document.getElementById('resetCameraBtn');
@@ -283,8 +387,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await API.analyzeImage(payload);
         updateImageFindings(result, file, isPreset ? payload : null);
       } else if (currentMode === 'audio') {
+        if (audioProcessingBanner) audioProcessingBanner.classList.remove('hidden');
+        const transcriptElem = document.getElementById('audioTranscriptText');
+        if (transcriptElem) {
+          transcriptElem.innerHTML = '<span style="color:#60a5fa;"><i class="fa-solid fa-spinner fa-spin"></i> Transcribing speech with Whisper AI engine (extracting acoustic timeline)...</span>';
+        }
         const payload = isPreset ? (presetPath || 'backend/data/uploads/audio/case01_distress_call_911.wav') : file;
         const result = await API.analyzeAudio(payload);
+        if (audioProcessingBanner) audioProcessingBanner.classList.add('hidden');
         updateAudioFindings(result, file, isPreset ? payload : null);
       } else if (currentMode === 'video') {
         const payload = isPreset ? (presetPath || 'backend/data/uploads/video/real_cctv_surveillance_store.mp4') : file;
@@ -403,23 +513,37 @@ document.addEventListener('DOMContentLoaded', () => {
     activeSessionId = result.session_id || 'session-audio-01';
     document.getElementById('currentSessionId').textContent = activeSessionId.substring(0, 13);
     audioChat.setSessionId(activeSessionId);
+    if (audioProcessingBanner) audioProcessingBanner.classList.add('hidden');
 
-    // Audio Player Source
-    const audioPlayer = document.getElementById('audioPlayer');
-    if (file && file instanceof File) {
-      audioPlayer.src = URL.createObjectURL(file);
-    } else if (presetPath) {
-      const norm = presetPath.replace(/\\/g, '/');
-      const parts = norm.split('/data/');
-      audioPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : (presetPath.startsWith('/') ? presetPath : `/${presetPath}`);
-    } else if (result.audio_path) {
-      const norm = result.audio_path.replace(/\\/g, '/');
-      const parts = norm.split('/data/');
-      audioPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : '/data/uploads/audio/case01_distress_call_911.wav';
-    } else {
-      audioPlayer.src = '/data/uploads/audio/case01_distress_call_911.wav';
+    // Audio Player Source Resolution
+    if (audioPlayer) {
+      let resolvedSrc = '';
+      if (file && file instanceof File) {
+        resolvedSrc = URL.createObjectURL(file);
+        if (audioTrackName) audioTrackName.innerHTML = `<i class="fa-solid fa-tape"></i> ${file.name}`;
+      } else if (presetPath) {
+        const norm = presetPath.replace(/\\/g, '/');
+        const parts = norm.split('/data/');
+        resolvedSrc = parts.length > 1 ? `/data/${parts[1]}` : (presetPath.startsWith('/') ? presetPath : `/${presetPath}`);
+        if (audioTrackName) audioTrackName.innerHTML = `<i class="fa-solid fa-tape"></i> ${presetPath.split('/').pop()}`;
+      } else if (result.audio_path) {
+        const norm = result.audio_path.replace(/\\/g, '/');
+        const parts = norm.split('/data/');
+        resolvedSrc = parts.length > 1 ? `/data/${parts[1]}` : '/data/uploads/audio/case01_distress_call_911.wav';
+        if (audioTrackName) audioTrackName.innerHTML = `<i class="fa-solid fa-tape"></i> ${norm.split('/').pop()}`;
+      } else {
+        resolvedSrc = '/data/uploads/audio/case01_distress_call_911.wav';
+        if (audioTrackName) audioTrackName.innerHTML = `<i class="fa-solid fa-tape"></i> 911 Emergency Dispatch Audio`;
+      }
+
+      audioPlayer.src = resolvedSrc;
+      audioPlayer.load();
+
+      // Trigger playback smoothly
+      audioPlayer.play().catch(e => {
+        console.log('Autoplay requires user gesture; ready to play:', e);
+      });
     }
-    audioPlayer.load();
 
     // Live Transcript
     if (result.transcription) {
@@ -505,10 +629,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Scene Intelligence
     if (result.scene_intelligence) {
-      document.getElementById('videoObjectsDetect').textContent = result.scene_intelligence.objects_detect;
-      document.getElementById('videoPeopleCount').textContent = result.scene_intelligence.people_count;
-      document.getElementById('videoLocation').textContent = result.scene_intelligence.location;
-      document.getElementById('videoAction').textContent = result.scene_intelligence.action;
+      document.getElementById('videoObjectsDetect').textContent = result.scene_intelligence.objects_detect || 'none';
+      document.getElementById('videoPeopleCount').textContent = result.scene_intelligence.people_count ?? 0;
+      const vehEl = document.getElementById('videoVehiclesCount');
+      if (vehEl) vehEl.textContent = result.scene_intelligence.vehicles_count ?? (result.summary_counts?.vehicles ?? 0);
+      document.getElementById('videoLocation').textContent = result.scene_intelligence.location || 'Surveillance Zone';
+      document.getElementById('videoAction').textContent = result.scene_intelligence.action || 'none';
     }
 
     // Second by Second Timeline

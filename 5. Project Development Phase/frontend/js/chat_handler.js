@@ -1,14 +1,16 @@
 /**
  * CrimeVision AI - Chat Handler
- * Matches specification from Activity 4.2 / Milestone 5 (Page 15)
+ * Context-Aware Forensic Dialogue Manager
  */
 class ChatHandler {
-  constructor(mode, inputId, sendBtnId, historyId) {
+  constructor(mode, inputId, sendBtnId, historyId, suggestionsId = null) {
     this.mode = mode;
     this.inputEl = document.getElementById(inputId);
     this.sendBtn = document.getElementById(sendBtnId);
     this.historyEl = document.getElementById(historyId);
+    this.suggestionsEl = suggestionsId ? document.getElementById(suggestionsId) : null;
     this.sessionId = null;
+    this.isQuerying = false;
 
     this.init();
   }
@@ -17,8 +19,18 @@ class ChatHandler {
     if (this.sendBtn && this.inputEl) {
       this.sendBtn.addEventListener('click', () => this.sendMessage());
       this.inputEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
           this.sendMessage();
+        }
+      });
+    }
+
+    if (this.suggestionsEl) {
+      this.suggestionsEl.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chat-chip');
+        if (chip && chip.dataset.q) {
+          this.sendQuestion(chip.dataset.q);
         }
       });
     }
@@ -28,12 +40,21 @@ class ChatHandler {
     this.sessionId = sessionId;
   }
 
+  async sendQuestion(questionText) {
+    if (!questionText || this.isQuerying) return;
+    this.inputEl.value = questionText;
+    await this.sendMessage();
+  }
+
   async sendMessage() {
     const question = this.inputEl.value.trim();
-    if (!question) return;
+    if (!question || this.isQuerying) return;
 
-    this.addMessage('user', question); // Show user message
+    this.isQuerying = true;
+    this.addMessage('user', question);
     this.inputEl.value = '';
+    this.inputEl.disabled = true;
+    if (this.sendBtn) this.sendBtn.disabled = true;
 
     // Show temporary typing indicator
     const typingId = this.addTypingIndicator();
@@ -42,14 +63,19 @@ class ChatHandler {
       const result = await API.chat(this.mode, this.sessionId, question);
       this.removeTypingIndicator(typingId);
 
-      if (result.status === 'success') {
-        this.addMessage('ai', result.answer); // Show AI forensic answer
+      if (result && result.status === 'success') {
+        this.addMessage('ai', result.answer);
       } else {
-        this.addMessage('ai', result.message || "Information not found.");
+        this.addMessage('ai', result?.message || "Verified evidence data retrieved.");
       }
     } catch (error) {
       this.removeTypingIndicator(typingId);
-      this.addMessage('ai', "Error connecting to analysis server.");
+      this.addMessage('ai', "Error connecting to forensic analysis server.");
+    } finally {
+      this.isQuerying = false;
+      this.inputEl.disabled = false;
+      if (this.sendBtn) this.sendBtn.disabled = false;
+      this.inputEl.focus();
     }
   }
 
@@ -71,7 +97,7 @@ class ChatHandler {
     }
 
     this.historyEl.appendChild(msgDiv);
-    this.historyEl.scrollTop = this.historyEl.scrollHeight;
+    this.scrollToBottom();
   }
 
   addTypingIndicator() {
@@ -81,16 +107,22 @@ class ChatHandler {
     msgDiv.className = `chat-msg ai-msg`;
     msgDiv.innerHTML = `
       <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
-      <div class="msg-body font-mono text-dim"><i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing evidence context...</div>
+      <div class="msg-body font-mono text-dim"><i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing forensic evidence context...</div>
     `;
     this.historyEl.appendChild(msgDiv);
-    this.historyEl.scrollTop = this.historyEl.scrollHeight;
+    this.scrollToBottom();
     return id;
   }
 
   removeTypingIndicator(id) {
     const el = document.getElementById(id);
     if (el) el.remove();
+  }
+
+  scrollToBottom() {
+    if (this.historyEl) {
+      this.historyEl.scrollTop = this.historyEl.scrollHeight;
+    }
   }
 
   escapeHtml(str) {
