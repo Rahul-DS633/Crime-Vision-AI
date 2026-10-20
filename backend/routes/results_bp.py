@@ -1,6 +1,8 @@
 import os
+# pyrefly: ignore [missing-import]
 import torch
-from flask import Blueprint, jsonify, send_file, request
+# pyrefly: ignore [missing-import]
+from flask import Blueprint, jsonify, send_file
 from config import REPORTS_DIR, DEVICE
 from utils.logger import setup_logger
 from services.session_store import session_store

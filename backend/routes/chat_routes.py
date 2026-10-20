@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 from flask import Blueprint, request, jsonify
 from utils.logger import setup_logger
 from services.chat_service import query_chat

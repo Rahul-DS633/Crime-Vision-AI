@@ -2,7 +2,9 @@
 Video Processor Module - OpenCV frame extraction and temporal sampling at 1Hz
 """
 import os
+# pyrefly: ignore [missing-import]
 import cv2
+# pyrefly: ignore [missing-import]
 import numpy as np
 from typing import List, Dict, Any, Tuple
 from utils.logger import setup_logger

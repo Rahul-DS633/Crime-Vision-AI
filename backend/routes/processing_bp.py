@@ -1,6 +1,8 @@
 import os
 import time
+# pyrefly: ignore [missing-import]
 from flask import Blueprint, request, jsonify
+# pyrefly: ignore [missing-import]
 from werkzeug.utils import secure_filename
 from config import IMAGE_UPLOAD_DIR, SAMPLES_DIR
 from utils.logger import setup_logger
@@ -64,7 +66,7 @@ def process_complete_pipeline(case_id="default"):
             video_path = os.path.join(IMAGE_UPLOAD_DIR.parent, "video", "sample_surveillance_store.mp4")
 
         # Run vision, audio, and video modules
-        vision_res = vision_service.analyze_image(image_path) if os.path.exists(image_path) else vision_service.analyze_image(image_path)
+        vision_res = vision_service.analyze_image(image_path)
         audio_res = audio_service.process_audio(audio_path)
         video_res = video_service.process_video(video_path)
 

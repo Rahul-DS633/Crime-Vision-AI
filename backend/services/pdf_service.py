@@ -11,6 +11,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from config import REPORTS_DIR
 from utils.logger import setup_logger
+from xml.sax.saxutils import escape as xml_escape
 
 logger = setup_logger("pdf_service")
 
@@ -93,11 +94,11 @@ def generate_forensic_pdf(session_id: str, context: dict) -> str:
     location = context.get("location") or context.get("scene_intelligence", {}).get("location", "Standard Grid")
     
     meta_data = [
-        [Paragraph("<b>Case Reference:</b>", bold_label), Paragraph(f"CV-AI-{session_id[:8].upper()}", body_style),
+        [Paragraph("<b>Case Reference:</b>", bold_label), Paragraph(f"CV-AI-{xml_escape(str(session_id[:8])).upper()}", body_style),
          Paragraph("<b>Date & Time:</b>", bold_label), Paragraph(now_str, body_style)],
         [Paragraph("<b>Lead Investigator:</b>", bold_label), Paragraph("Rahul Rajak", body_style),
-         Paragraph("<b>Classification:</b>", bold_label), Paragraph(str(crime_type), body_style)],
-        [Paragraph("<b>Location/Scene:</b>", bold_label), Paragraph(str(location).title(), body_style),
+         Paragraph("<b>Classification:</b>", bold_label), Paragraph(xml_escape(str(crime_type)), body_style)],
+        [Paragraph("<b>Location/Scene:</b>", bold_label), Paragraph(xml_escape(str(location).title()), body_style),
          Paragraph("<b>Integrity Status:</b>", bold_label), Paragraph("Cryptographically Verified", body_style)]
     ]
     meta_table = Table(meta_data, colWidths=[110, 160, 110, 160])
@@ -119,7 +120,7 @@ def generate_forensic_pdf(session_id: str, context: dict) -> str:
         context.get("ai_visual_summary") or 
         "Multimodal evidence analyzed using RT-DETR detection, Whisper speech analysis, and Groq-powered forensic reasoning."
     )
-    story.append(Paragraph(summary_text, body_style))
+    story.append(Paragraph(xml_escape(str(summary_text)), body_style))
     story.append(Spacer(1, 8))
 
     # Object Evidence Catalog
@@ -131,10 +132,10 @@ def generate_forensic_pdf(session_id: str, context: dict) -> str:
             pos = det.get("position_3d", {"x": 0, "y": 0, "z": 0})
             pos_str = f"[{pos.get('x',0)}, {pos.get('y',0)}, {pos.get('z',0)}]"
             det_rows.append([
-                Paragraph(det.get("label", "Item"), body_style),
-                Paragraph(det.get("raw_label", "object"), body_style),
+                Paragraph(xml_escape(str(det.get("label", "Item"))), body_style),
+                Paragraph(xml_escape(str(det.get("raw_label", "object"))), body_style),
                 Paragraph(f"{int(det.get('confidence', 0.8) * 100)}%", body_style),
-                Paragraph(pos_str, body_style)
+                Paragraph(xml_escape(pos_str), body_style)
             ])
         det_table = Table(det_rows, colWidths=[130, 130, 100, 180])
         det_table.setStyle(TableStyle([
@@ -147,7 +148,7 @@ def generate_forensic_pdf(session_id: str, context: dict) -> str:
         story.append(det_table)
     else:
         facts = context.get("evidence_facts") or ["Human", "Weapon", "knife", "tape", "office furniture"]
-        story.append(Paragraph(f"Identified Physical Evidence: {', '.join(facts)}", body_style))
+        story.append(Paragraph(f"Identified Physical Evidence: {xml_escape(', '.join(str(f) for f in facts))}", body_style))
 
     story.append(Spacer(1, 8))
 
@@ -158,8 +159,8 @@ def generate_forensic_pdf(session_id: str, context: dict) -> str:
         time_rows = [[Paragraph("<b>Timestamp</b>", bold_label), Paragraph("<b>Observed Event & Intelligence</b>", bold_label)]]
         for item in timeline[:12]:
             time_rows.append([
-                Paragraph(f"<b>{item.get('time', '00:00')}</b>", body_style),
-                Paragraph(item.get("event", "Event observed"), body_style)
+                Paragraph(f"<b>{xml_escape(str(item.get('time', '00:00')))}</b>", body_style),
+                Paragraph(xml_escape(str(item.get("event", "Event observed"))), body_style)
             ])
         timeline_table = Table(time_rows, colWidths=[90, 450])
         timeline_table.setStyle(TableStyle([
@@ -180,7 +181,7 @@ def generate_forensic_pdf(session_id: str, context: dict) -> str:
     scenarios = context.get("scenarios", [])
     if scenarios:
         for scen in scenarios:
-            story.append(Paragraph(f"• {scen}", body_style))
+            story.append(Paragraph(f"• {xml_escape(str(scen))}", body_style))
             story.append(Spacer(1, 3))
     else:
         story.append(Paragraph("• Scenario 1: Direct confrontational assault at crime location.", body_style))

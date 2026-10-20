@@ -24,8 +24,12 @@ def load_rt_detr_model():
     logger.info(f"Loading RT-DETR object detection model ({model_name}) on {DEVICE}...")
     try:
         from transformers import AutoImageProcessor, AutoModelForObjectDetection
-        processor = AutoImageProcessor.from_pretrained(model_name)
-        model = AutoModelForObjectDetection.from_pretrained(model_name).to(DEVICE)
+        try:
+            processor = AutoImageProcessor.from_pretrained(model_name, local_files_only=True)
+            model = AutoModelForObjectDetection.from_pretrained(model_name, local_files_only=True).to(DEVICE)
+        except Exception:
+            processor = AutoImageProcessor.from_pretrained(model_name)
+            model = AutoModelForObjectDetection.from_pretrained(model_name).to(DEVICE)
         model.eval()
         _models["rt_detr"] = {
             "processor": processor,
@@ -56,8 +60,12 @@ def load_clip_model():
     logger.info(f"Loading CLIP model ({model_name}) on {DEVICE}...")
     try:
         from transformers import CLIPProcessor, CLIPModel
-        processor = CLIPProcessor.from_pretrained(model_name)
-        model = CLIPModel.from_pretrained(model_name).to(DEVICE)
+        try:
+            processor = CLIPProcessor.from_pretrained(model_name, local_files_only=True)
+            model = CLIPModel.from_pretrained(model_name, local_files_only=True).to(DEVICE)
+        except Exception:
+            processor = CLIPProcessor.from_pretrained(model_name)
+            model = CLIPModel.from_pretrained(model_name).to(DEVICE)
         model.eval()
         _models["clip"] = {
             "processor": processor,
@@ -86,8 +94,12 @@ def load_blip2_model():
     logger.info(f"Loading BLIP captioning model ({model_name}) on {DEVICE}...")
     try:
         from transformers import BlipProcessor, BlipForConditionalGeneration
-        processor = BlipProcessor.from_pretrained(model_name)
-        model = BlipForConditionalGeneration.from_pretrained(model_name).to(DEVICE)
+        try:
+            processor = BlipProcessor.from_pretrained(model_name, local_files_only=True)
+            model = BlipForConditionalGeneration.from_pretrained(model_name, local_files_only=True).to(DEVICE)
+        except Exception:
+            processor = BlipProcessor.from_pretrained(model_name)
+            model = BlipForConditionalGeneration.from_pretrained(model_name).to(DEVICE)
         model.eval()
         _models["blip2"] = {
             "processor": processor,
