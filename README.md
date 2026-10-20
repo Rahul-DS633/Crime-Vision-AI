@@ -67,11 +67,11 @@ python --version
 
 ### 2. Install Dependencies
 ```bash
-pip install -r backend/requirements.txt
+pip install -r "5. Project Development Phase/backend/requirements.txt"
 ```
 
 ### 3. Configure Environment Variables (Optional for Groq LLM)
-Create or edit `backend/.env`:
+Create or edit `5. Project Development Phase/backend/.env`:
 ```env
 GROQ_API_KEY=your_groq_api_key_here
 GROQ_MODEL=llama-3.3-70b-versatile
@@ -82,12 +82,15 @@ PORT=5000
 ### 4. Run Validation Tests
 Verify system integrity:
 ```bash
+cd "5. Project Development Phase"
 python -m unittest backend/tests/test_validation.py
 ```
 
 ### 5. Launch Application
 Start the Flask forensic server:
 ```bash
+# Navigate to the development directory
+cd "5. Project Development Phase"
 python backend/app.py
 ```
 Open your browser and navigate to:

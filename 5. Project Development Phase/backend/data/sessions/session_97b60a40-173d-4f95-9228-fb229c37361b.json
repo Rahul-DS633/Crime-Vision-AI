@@ -1,0 +1,395 @@
+{
+  "session_id": "97b60a40-173d-4f95-9228-fb229c37361b",
+  "data": {
+    "status": "success",
+    "image_path": "C:\\Users\\rahul rajak\\OneDrive\\cloud space\\OneDrive\\Desktop\\all projects\\crime visionAi\\backend\\data\\uploads\\image\\sample_crime_scene.jpg",
+    "location": "office",
+    "people_count": 1,
+    "weapons_count": 1,
+    "objects_count": 8,
+    "actions": [
+      "lying down"
+    ],
+    "evidence_facts": [
+      "laptop",
+      "cup",
+      "sofa",
+      "Human",
+      "chair",
+      "diningtable",
+      "tape",
+      "Weapon"
+    ],
+    "detections": [
+      {
+        "label": "Human",
+        "raw_label": "person",
+        "confidence": 0.94,
+        "box_2d": [
+          200,
+          210,
+          600,
+          510
+        ],
+        "box_normalized": [
+          0.25,
+          0.35,
+          0.75,
+          0.85
+        ],
+        "position_3d": {
+          "x": 0.0,
+          "y": 0.2,
+          "z": -1.5
+        }
+      },
+      {
+        "label": "Weapon",
+        "raw_label": "knife",
+        "confidence": 0.88,
+        "box_2d": [
+          480,
+          390,
+          560,
+          450
+        ],
+        "box_normalized": [
+          0.6,
+          0.65,
+          0.7,
+          0.75
+        ],
+        "position_3d": {
+          "x": 1.2,
+          "y": 0.1,
+          "z": -1.2
+        }
+      },
+      {
+        "label": "tape",
+        "raw_label": "tape",
+        "confidence": 0.82,
+        "box_2d": [
+          240,
+          270,
+          320,
+          330
+        ],
+        "box_normalized": [
+          0.3,
+          0.45,
+          0.4,
+          0.55
+        ],
+        "position_3d": {
+          "x": -0.8,
+          "y": 0.4,
+          "z": -1.4
+        }
+      },
+      {
+        "label": "chair",
+        "raw_label": "chair",
+        "confidence": 0.91,
+        "box_2d": [
+          80,
+          90,
+          280,
+          390
+        ],
+        "box_normalized": [
+          0.1,
+          0.15,
+          0.35,
+          0.65
+        ],
+        "position_3d": {
+          "x": -2.2,
+          "y": 0.8,
+          "z": -2.5
+        }
+      },
+      {
+        "label": "laptop",
+        "raw_label": "laptop",
+        "confidence": 0.89,
+        "box_2d": [
+          560,
+          120,
+          704,
+          270
+        ],
+        "box_normalized": [
+          0.7,
+          0.2,
+          0.88,
+          0.45
+        ],
+        "position_3d": {
+          "x": 2.1,
+          "y": 0.9,
+          "z": -2.2
+        }
+      },
+      {
+        "label": "diningtable",
+        "raw_label": "diningtable",
+        "confidence": 0.85,
+        "box_2d": [
+          520,
+          210,
+          760,
+          450
+        ],
+        "box_normalized": [
+          0.65,
+          0.35,
+          0.95,
+          0.75
+        ],
+        "position_3d": {
+          "x": 2.4,
+          "y": 0.5,
+          "z": -2.0
+        }
+      },
+      {
+        "label": "sofa",
+        "raw_label": "sofa",
+        "confidence": 0.78,
+        "box_2d": [
+          40,
+          300,
+          240,
+          540
+        ],
+        "box_normalized": [
+          0.05,
+          0.5,
+          0.3,
+          0.9
+        ],
+        "position_3d": {
+          "x": -2.5,
+          "y": 0.5,
+          "z": -1.0
+        }
+      },
+      {
+        "label": "cup",
+        "raw_label": "cup",
+        "confidence": 0.76,
+        "box_2d": [
+          576,
+          180,
+          624,
+          228
+        ],
+        "box_normalized": [
+          0.72,
+          0.3,
+          0.78,
+          0.38
+        ],
+        "position_3d": {
+          "x": 1.8,
+          "y": 0.9,
+          "z": -2.0
+        }
+      }
+    ],
+    "visual_summary": "a man in a blue suit is standing in front of a desk with a computer and a red ball",
+    "ai_scene_summary": {
+      "summary_type": "Crime Scene",
+      "brief_description": "A male individual is observed lying on the floor, surrounded by a knife and restrained with tape.",
+      "full_text": "Summary Type: Crime Scene\nBrief Description: A male individual is observed lying on the floor, surrounded by a knife and restrained with tape."
+    },
+    "scenarios": [
+      "Scenario 1: The man was attacked by an unknown assailant while working late in the office, and the perpetrator used the knife to inflict fatal wounds before fleeing the scene.",
+      "Scenario 2: The individual, feeling overwhelmed by stress, attempted to harm himself with the knife but was unable to complete the act and lies there, awaiting help, with the tape possibly being used in a misguided attempt to treat the wound.",
+      "Scenario 3: The person staged a crime scene to mislead investigators, strategically placing the knife and tape to create the illusion of a violent struggle, but ultimately fell asleep or lost consciousness on the floor."
+    ],
+    "scene_3d_data": {
+      "room_type": "office",
+      "objects": [
+        {
+          "label": "Human",
+          "raw_label": "person",
+          "confidence": 0.94,
+          "box_2d": [
+            200,
+            210,
+            600,
+            510
+          ],
+          "box_normalized": [
+            0.25,
+            0.35,
+            0.75,
+            0.85
+          ],
+          "position_3d": {
+            "x": 0.0,
+            "y": 0.2,
+            "z": -1.5
+          }
+        },
+        {
+          "label": "Weapon",
+          "raw_label": "knife",
+          "confidence": 0.88,
+          "box_2d": [
+            480,
+            390,
+            560,
+            450
+          ],
+          "box_normalized": [
+            0.6,
+            0.65,
+            0.7,
+            0.75
+          ],
+          "position_3d": {
+            "x": 1.2,
+            "y": 0.1,
+            "z": -1.2
+          }
+        },
+        {
+          "label": "tape",
+          "raw_label": "tape",
+          "confidence": 0.82,
+          "box_2d": [
+            240,
+            270,
+            320,
+            330
+          ],
+          "box_normalized": [
+            0.3,
+            0.45,
+            0.4,
+            0.55
+          ],
+          "position_3d": {
+            "x": -0.8,
+            "y": 0.4,
+            "z": -1.4
+          }
+        },
+        {
+          "label": "chair",
+          "raw_label": "chair",
+          "confidence": 0.91,
+          "box_2d": [
+            80,
+            90,
+            280,
+            390
+          ],
+          "box_normalized": [
+            0.1,
+            0.15,
+            0.35,
+            0.65
+          ],
+          "position_3d": {
+            "x": -2.2,
+            "y": 0.8,
+            "z": -2.5
+          }
+        },
+        {
+          "label": "laptop",
+          "raw_label": "laptop",
+          "confidence": 0.89,
+          "box_2d": [
+            560,
+            120,
+            704,
+            270
+          ],
+          "box_normalized": [
+            0.7,
+            0.2,
+            0.88,
+            0.45
+          ],
+          "position_3d": {
+            "x": 2.1,
+            "y": 0.9,
+            "z": -2.2
+          }
+        },
+        {
+          "label": "diningtable",
+          "raw_label": "diningtable",
+          "confidence": 0.85,
+          "box_2d": [
+            520,
+            210,
+            760,
+            450
+          ],
+          "box_normalized": [
+            0.65,
+            0.35,
+            0.95,
+            0.75
+          ],
+          "position_3d": {
+            "x": 2.4,
+            "y": 0.5,
+            "z": -2.0
+          }
+        },
+        {
+          "label": "sofa",
+          "raw_label": "sofa",
+          "confidence": 0.78,
+          "box_2d": [
+            40,
+            300,
+            240,
+            540
+          ],
+          "box_normalized": [
+            0.05,
+            0.5,
+            0.3,
+            0.9
+          ],
+          "position_3d": {
+            "x": -2.5,
+            "y": 0.5,
+            "z": -1.0
+          }
+        },
+        {
+          "label": "cup",
+          "raw_label": "cup",
+          "confidence": 0.76,
+          "box_2d": [
+            576,
+            180,
+            624,
+            228
+          ],
+          "box_normalized": [
+            0.72,
+            0.3,
+            0.78,
+            0.38
+          ],
+          "position_3d": {
+            "x": 1.8,
+            "y": 0.9,
+            "z": -2.0
+          }
+        }
+      ]
+    }
+  },
+  "timestamp": 1791990844.8624635
+}

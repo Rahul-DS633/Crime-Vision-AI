@@ -24,8 +24,15 @@ from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image as RLImage, PageBreak
 )
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DIAGRAM_PATH = os.path.join(BASE_DIR, "architecture_diagram.png")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+if os.path.basename(script_dir).startswith("5."):
+    BASE_DIR = os.path.dirname(script_dir)
+else:
+    BASE_DIR = script_dir
+
+DIAGRAM_PATH = os.path.join(script_dir, "architecture_diagram.png")
+if not os.path.exists(DIAGRAM_PATH):
+    DIAGRAM_PATH = os.path.join(BASE_DIR, "3. Project Design Phase", "architecture_diagram.png")
 
 # Folder definitions matching official structure
 FOLDERS = {

@@ -1,0 +1,90 @@
+{
+  "session_id": "429fd96b-d39a-4ee3-924f-147caa2f7062",
+  "data": {
+    "status": "success",
+    "audio_path": "C:\\Users\\rahul rajak\\OneDrive\\cloud space\\OneDrive\\Desktop\\all projects\\crime visionAi\\backend\\data\\uploads\\audio\\sample_robbery_witness.wav",
+    "transcription": "Thank you so much for watching.",
+    "summary": "The witness reported observing two masked individuals exiting the jewelry store on Maple Avenue around 8 p.m., fleeing the scene in a dark car after dropping a necklace, and speeding away as the store's alarm sounded.",
+    "crime_type": "ROBBERY",
+    "location": "STORE",
+    "detailed_location": "jewelry store on the corner of Maple Avenue",
+    "facts": {
+      "who": [
+        "two masked individuals exiting the jewelry store carrying bags; one dropped a necklace; fled in a dark car"
+      ],
+      "where": [
+        "jewelry store on the corner of Maple Avenue"
+      ],
+      "when": [
+        "around 8 p.m."
+      ],
+      "actions": [
+        "witness noticed lights on inside jewelry store",
+        "two masked individuals rushed out of store",
+        "suspect dropped necklace on sidewalk",
+        "suspects sped off in car",
+        "store alarm blaring"
+      ],
+      "suspect_description": "two masked individuals exiting the jewelry store carrying bags; one dropped a necklace; fled in a dark car",
+      "crime_type": "ROBBERY",
+      "location_badge": "STORE"
+    },
+    "timeline": [
+      {
+        "time": "00:00",
+        "event": "witness noticed lights on inside jewelry store",
+        "seconds": 0,
+        "start_raw": 0.0,
+        "end_raw": 6.8
+      },
+      {
+        "time": "00:07",
+        "event": "two masked individuals rushed out of store",
+        "seconds": 7,
+        "start_raw": 7.0,
+        "end_raw": 11.5
+      },
+      {
+        "time": "00:12",
+        "event": "suspect dropped necklace on sidewalk",
+        "seconds": 12,
+        "start_raw": 12.0,
+        "end_raw": 14.8
+      },
+      {
+        "time": "00:15",
+        "event": "suspects sped off in dark car",
+        "seconds": 15,
+        "start_raw": 15.0,
+        "end_raw": 20.2
+      },
+      {
+        "time": "00:21",
+        "event": "store alarm blaring",
+        "seconds": 21,
+        "start_raw": 21.0,
+        "end_raw": 25.0
+      }
+    ],
+    "translations": {
+      "english": "I was walking down Maple Avenue around 8 p.m. when I noticed the lights still on inside the jewelry store on the corner. Suddenly, I saw two masked individuals rush out of the store carrying bags. One of them dropped a necklace on the sidewalk. They jumped into a dark car parked nearby and sped off before anyone could react. I remember hearing the store alarm blaring right after they drove away.",
+      "hindi": "\u092e\u0948\u0902 \u0932\u0917\u092d\u0917 8 \u092c\u091c\u0947 \u092e\u0947\u092a\u0932 \u090f\u0935\u0947\u0928\u094d\u092f\u0942 \u092a\u0930 \u091a\u0932 \u0930\u0939\u093e \u0925\u093e \u091c\u092c \u092e\u0948\u0902\u0928\u0947 \u0926\u0947\u0916\u093e \u0915\u093f \u0915\u094b\u0928\u0947 \u092a\u0930 \u0938\u094d\u0925\u093f\u0924 \u091c\u094d\u0935\u0947\u0932\u0930\u0940 \u0938\u094d\u091f\u094b\u0930 \u0915\u0947 \u0905\u0902\u0926\u0930 \u0905\u092d\u0940 \u092d\u0940 \u0930\u094b\u0936\u0928\u0940 \u091c\u0932 \u0930\u0939\u0940 \u0925\u0940\u0964 \u0905\u091a\u093e\u0928\u0915, \u092e\u0948\u0902\u0928\u0947 \u0926\u094b \u092e\u093e\u0938\u094d\u0915\u0927\u093e\u0930\u0940 \u0935\u094d\u092f\u0915\u094d\u0924\u093f\u092f\u094b\u0902 \u0915\u094b \u0938\u094d\u091f\u094b\u0930 \u0938\u0947 \u092c\u0948\u0917 \u0932\u0947\u0915\u0930 \u092d\u093e\u0917\u0924\u0947 \u0939\u0941\u090f \u0926\u0947\u0916\u093e\u0964 \u0909\u0928\u092e\u0947\u0902 \u0938\u0947 \u090f\u0915 \u0928\u0947 \u0938\u093e\u0907\u0921\u0935\u0949\u0915 \u092a\u0930 \u090f\u0915 \u0939\u093e\u0930 \u0917\u093f\u0930\u093e \u0926\u093f\u092f\u093e\u0964 \u0935\u0947 \u092a\u093e\u0938 \u0915\u0947 \u090f\u0915 \u0905\u0902\u0927\u0947\u0930\u0947 \u0915\u093e\u0930 \u092a\u093e\u0930\u094d\u0915 \u092e\u0947\u0902 \u0915\u0942\u0926 \u0917\u090f \u0914\u0930 \u0915\u093f\u0938\u0940 \u0915\u0940 \u092a\u094d\u0930\u0924\u093f\u0915\u094d\u0930\u093f\u092f\u093e \u0938\u0947 \u092a\u0939\u0932\u0947 \u0939\u0940 \u0924\u0947\u091c\u0940 \u0938\u0947 \u091a\u0932\u0947 \u0917\u090f\u0964 \u092e\u0941\u091d\u0947 \u092f\u093e\u0926 \u0939\u0948 \u0915\u093f \u0935\u0947 \u091a\u0932\u0947 \u091c\u093e\u0928\u0947 \u0915\u0947 \u0924\u0941\u0930\u0902\u0924 \u092c\u093e\u0926 \u0938\u094d\u091f\u094b\u0930 \u0905\u0932\u093e\u0930\u094d\u092e \u0915\u0940 \u0906\u0935\u093e\u091c \u0938\u0941\u0928\u093e\u0908 \u0926\u0947 \u0930\u0939\u0940 \u0925\u0940\u0964",
+      "telugu": "\u0c2e\u0c47\u0c2a\u0c41\u0c32\u0c4d \u0c05\u0c35\u0c46\u0c28\u0c4d\u0c2f\u0c42\u0c32\u0c4b \u0c38\u0c41\u0c2e\u0c3e\u0c30\u0c41 8 \u0c17\u0c02\u0c1f\u0c32 \u0c38\u0c2e\u0c2f\u0c02\u0c32\u0c4b \u0c28\u0c47\u0c28\u0c41 \u0c28\u0c21\u0c41\u0c38\u0c4d\u0c24\u0c41\u0c02\u0c21\u0c17\u0c3e, \u0c2e\u0c42\u0c32\u0c32\u0c4b \u0c09\u0c28\u0c4d\u0c28 \u0c06\u0c2d\u0c30\u0c23\u0c3e\u0c32 \u0c26\u0c41\u0c15\u0c3e\u0c23\u0c02\u0c32\u0c4b \u0c07\u0c02\u0c15\u0c3e \u0c32\u0c48\u0c1f\u0c4d\u0c32\u0c41 \u0c35\u0c46\u0c32\u0c3f\u0c17\u0c47 \u0c09\u0c28\u0c4d\u0c28\u0c3e\u0c2f\u0c28\u0c3f \u0c28\u0c47\u0c28\u0c41 \u0c17\u0c2e\u0c28\u0c3f\u0c02\u0c1a\u0c3e\u0c28\u0c41. \u0c39\u0c20\u0c3e\u0c24\u0c4d\u0c24\u0c41\u0c17\u0c3e, \u0c2c\u0c4d\u0c2f\u0c3e\u0c17\u0c41\u0c32\u0c24\u0c4b \u0c26\u0c41\u0c15\u0c3e\u0c23\u0c02 \u0c28\u0c41\u0c02\u0c21\u0c3f \u0c30\u0c46\u0c02\u0c21\u0c41 \u0c2e\u0c41\u0c16\u0c02 \u0c2e\u0c42\u0c38\u0c41\u0c15\u0c41\u0c28\u0c4d\u0c28 \u0c35\u0c4d\u0c2f\u0c15\u0c4d\u0c24\u0c41\u0c32\u0c41 \u0c35\u0c46\u0c33\u0c4d\u0c32\u0c3f\u0c2a\u0c4b\u0c24\u0c41\u0c28\u0c4d\u0c28\u0c3e\u0c30\u0c28\u0c3f \u0c28\u0c47\u0c28\u0c41 \u0c1a\u0c42\u0c36\u0c3e\u0c28\u0c41. \u0c35\u0c3e\u0c30\u0c3f\u0c32\u0c4b \u0c12\u0c15\u0c30\u0c41 \u0c28\u0c21\u0c3f\u0c35\u0c40\u0c27\u0c3f\u0c32\u0c4b \u0c12\u0c15 \u0c2e\u0c3e\u0c32\u0c28\u0c41 \u0c2a\u0c21\u0c35\u0c47\u0c36\u0c3e\u0c30\u0c41. \u0c35\u0c3e\u0c30\u0c41 \u0c2a\u0c4d\u0c30\u0c15\u0c4d\u0c15\u0c28\u0c47 \u0c09\u0c28\u0c4d\u0c28 \u0c1a\u0c40\u0c15\u0c1f\u0c3f \u0c15\u0c3e\u0c30\u0c41\u0c32\u0c4b\u0c15\u0c3f \u0c26\u0c42\u0c15\u0c3f \u0c0e\u0c35\u0c30\u0c42 \u0c2a\u0c4d\u0c30\u0c24\u0c3f\u0c38\u0c4d\u0c2a\u0c02\u0c26\u0c3f\u0c02\u0c1a\u0c15\u0c2e\u0c41\u0c02\u0c26\u0c47 \u0c35\u0c46\u0c33\u0c4d\u0c32\u0c3f\u0c2a\u0c4b\u0c2f\u0c3e\u0c30\u0c41. \u0c35\u0c3e\u0c30\u0c41 \u0c35\u0c46\u0c33\u0c4d\u0c32\u0c3f\u0c2a\u0c4b\u0c2f\u0c3f\u0c28 \u0c35\u0c46\u0c02\u0c1f\u0c28\u0c47 \u0c26\u0c41\u0c15\u0c3e\u0c23\u0c02 \u0c05\u0c32\u0c3e\u0c30\u0c02 \u0c2e\u0c4d\u0c30\u0c4b\u0c17\u0c41\u0c24\u0c41\u0c28\u0c4d\u0c28\u0c1f\u0c4d\u0c32\u0c41 \u0c28\u0c47\u0c28\u0c41 \u0c17\u0c41\u0c30\u0c4d\u0c24\u0c41\u0c1a\u0c47\u0c38\u0c41\u0c15\u0c41\u0c28\u0c4d\u0c28\u0c3e\u0c28\u0c41.",
+      "french": "J'ai march\u00e9 le long de l'avenue Maple vers 20 heures lorsque j'ai remarqu\u00e9 que les lumi\u00e8res \u00e9taient toujours allum\u00e9es \u00e0 l'int\u00e9rieur du magasin de bijoux au coin de la rue. Soudain, j'ai vu deux individus masqu\u00e9s sortir pr\u00e9cipitamment du magasin en portant des sacs. L'un d'eux a laiss\u00e9 tomber un collier sur le trottoir. Ils ont saut\u00e9 dans une voiture sombre gar\u00e9e \u00e0 proximit\u00e9 et ont d\u00e9marr\u00e9 avant que quiconque puisse r\u00e9agir. Je me souviens d'avoir entendu la sir\u00e8ne du magasin retentir imm\u00e9diatement apr\u00e8s leur d\u00e9part."
+    },
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 5.0,
+        "text": "Thank you so much for watching."
+      }
+    ],
+    "scenarios": [
+      "Scenario 1: Commercial Burglary / Robbery - Coordinated entry into jewelry retail establishment after normal business hours, seizing display merchandise.",
+      "Scenario 2: Smash and Grab - Opportunistic robbery exploiting late evening visibility, with a getaway driver stationed outside.",
+      "Scenario 3: Internal Collusion - Staged incident intended to trigger insurance recovery, evidenced by prompt alarm activation after vehicle departure."
+    ],
+    "processing_time": 1.65
+  },
+  "timestamp": 1792070509.217278
+}

@@ -1,0 +1,80 @@
+{
+  "session_id": "4813cd66-b640-4c48-8164-e3deded005c4",
+  "data": {
+    "status": "success",
+    "image_path": "backend/data/external_samples/image/case02_bank_vault_heist.jpg",
+    "location": "bank",
+    "people_count": 0,
+    "weapons_count": 0,
+    "objects_count": 1,
+    "actions": [
+      "lying down"
+    ],
+    "evidence_facts": [
+      "mouse"
+    ],
+    "detections": [
+      {
+        "label": "mouse",
+        "raw_label": "mouse",
+        "confidence": 0.699,
+        "box_2d": [
+          449.07,
+          99.86,
+          751.25,
+          402.16
+        ],
+        "box_normalized": [
+          0.5613,
+          0.1664,
+          0.9391,
+          0.6703
+        ],
+        "position_3d": {
+          "x": 2.0,
+          "y": 1.74,
+          "z": -0.98
+        }
+      }
+    ],
+    "visual_summary": "a person standing in front of a large object",
+    "ai_scene_summary": {
+      "summary_type": "Crime Scene",
+      "brief_description": "A male individual is observed lying on the floor, surrounded by a knife and restrained with tape.",
+      "full_text": "Summary Type: Crime Scene\nBrief Description: A male individual is observed lying on the floor, surrounded by a knife and restrained with tape."
+    },
+    "scenarios": [
+      "Scenario 1: The man was attacked by an unknown assailant while working late in the office, and the perpetrator used the knife to inflict fatal wounds before fleeing the scene.",
+      "Scenario 2: The individual, feeling overwhelmed by stress, attempted to harm himself with the knife but was unable to complete the act and lies there, awaiting help, with the tape possibly being used in a misguided attempt to treat the wound.",
+      "Scenario 3: The person staged a crime scene to mislead investigators, strategically placing the knife and tape to create the illusion of a violent struggle, but ultimately fell asleep or lost consciousness on the floor."
+    ],
+    "scene_3d_data": {
+      "room_type": "bank",
+      "objects": [
+        {
+          "label": "mouse",
+          "raw_label": "mouse",
+          "confidence": 0.699,
+          "box_2d": [
+            449.07,
+            99.86,
+            751.25,
+            402.16
+          ],
+          "box_normalized": [
+            0.5613,
+            0.1664,
+            0.9391,
+            0.6703
+          ],
+          "position_3d": {
+            "x": 2.0,
+            "y": 1.74,
+            "z": -0.98
+          }
+        }
+      ]
+    }
+  },
+  "timestamp": 1792477426.228854
+}

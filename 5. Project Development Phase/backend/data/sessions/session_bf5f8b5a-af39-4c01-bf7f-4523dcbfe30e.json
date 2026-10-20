@@ -1,0 +1,271 @@
+{
+  "session_id": "bf5f8b5a-af39-4c01-bf7f-4523dcbfe30e",
+  "data": {
+    "status": "success",
+    "video_path": "C:\\Users\\rahul rajak\\OneDrive\\cloud space\\OneDrive\\Desktop\\all projects\\crime visionAi\\backend\\data\\uploads\\video\\sample_surveillance_store.mp4",
+    "duration": 15.0,
+    "dimensions": {
+      "width": 640,
+      "height": 480
+    },
+    "scene_intelligence": {
+      "objects_detect": "refrigerator, handbag, orange, backpack, donut",
+      "people_count": 2,
+      "location": "Shopping mall store",
+      "action": "none"
+    },
+    "crime_classification": {
+      "crime_type": "NORMAL ACTIVITY",
+      "confidence": 90,
+      "badge": "NORMAL ACTIVITY (90%)",
+      "badge_type": "success",
+      "reason": "No explicit crime committed",
+      "action": "none",
+      "location": "Shopping mall store"
+    },
+    "ai_visual_summary": "A man and a woman are seen entering and moving within a store located in a shopping mall, as captured by surveillance footage over a period of 15 seconds. The video sequences show the individuals navigating the store, with no explicit depiction of a crime being committed during this time frame.",
+    "timeline": [
+      {
+        "time": "00:00",
+        "event": "A man is in a store with multiple refrigerators and handbags.",
+        "seconds": 0,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:01",
+        "event": "A person is in the middle of a store with other people and refrigerators.",
+        "seconds": 1,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:02",
+        "event": "A store in a shopping mall has people and refrigerators.",
+        "seconds": 2,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:03",
+        "event": "A person is seen among multiple people and refrigerators in a store.",
+        "seconds": 3,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:04",
+        "event": "A store has people, handbags, and refrigerators.",
+        "seconds": 4,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:05",
+        "event": "A store has people, handbags, and refrigerators.",
+        "seconds": 5,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:06",
+        "event": "A shopper is in a store with backpacks and refrigerators.",
+        "seconds": 6,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:07",
+        "event": "A store in a shopping area has people, backpacks, and handbags.",
+        "seconds": 7,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:08",
+        "event": "A woman is in a store with multiple handbags and refrigerators.",
+        "seconds": 8,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:09",
+        "event": "A store has people and a plethora of refrigerators.",
+        "seconds": 9,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:10",
+        "event": "A store has people and a plethora of refrigerators.",
+        "seconds": 10,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:11",
+        "event": "A shop in a mall has people and refrigerators.",
+        "seconds": 11,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:12",
+        "event": "People and refrigerators are present.",
+        "seconds": 12,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:13",
+        "event": "People and refrigerators are still visible.",
+        "seconds": 13,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:14",
+        "event": "Multiple people and handbags are seen with refrigerators.",
+        "seconds": 14,
+        "objects_at_second": [
+          "Human",
+          "Human",
+          "refrigerator",
+          "refrigerator",
+          "handbag",
+          "backpack",
+          "orange",
+          "donut"
+        ]
+      },
+      {
+        "time": "00:15",
+        "event": "No significant activity",
+        "seconds": 15,
+        "objects_at_second": []
+      }
+    ],
+    "unique_objects": [
+      "Human",
+      "backpack",
+      "donut",
+      "handbag",
+      "orange",
+      "refrigerator"
+    ],
+    "processing_time": 0.14
+  },
+  "timestamp": 1792070081.9455912
+}
