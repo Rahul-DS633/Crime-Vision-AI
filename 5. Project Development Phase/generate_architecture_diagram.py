@@ -50,9 +50,9 @@ def create_architecture_diagram():
 
     draw_card((70, 150, 340, 245), "Three.js 3D Viewport", "• WebGL Spatial Canvas\n• OrbitControls & Camera\n• Evidence 3D Depth Cubes", (30, 41, 59), (14, 165, 233), "3D")
     draw_card((360, 150, 630, 245), "Evidence Upload Panel", "• Drag & Drop Zone\n• Multi-Format Validation\n• Benchmark Presets", (30, 41, 59), (99, 102, 241), "UI")
-    draw_card((650, 150, 920, 245), "Acoustic & Translation HUD", "• HTML5 Audio Player\n• Live Speech Transcript\n• Hindi/Telugu/Fr Tabs", (30, 41, 59), (168, 85, 247), "AUDIO")
-    draw_card((940, 150, 1220, 245), "Surveillance Timeline", "• 1.0 Hz Frame Cards\n• Suspicious Activity Badge\n• Synchronized Event Grid", (30, 41, 59), (236, 72, 153), "VIDEO")
-    draw_card((1240, 150, 1530, 245), "Forensic AI Chatbot", "• Natural Language Q&A\n• Groq Evidence Grounding\n• Court PDF One-Click", (30, 41, 59), (16, 185, 129), "CHAT")
+    draw_card((650, 150, 920, 245), "Acoustic & Translation HUD", "• HTML5 Audio Player\n• 36-Bar Waveform EQ\n• Whisper Speech Transcript\n• 4-Language Translation", (30, 41, 59), (168, 85, 247), "AUDIO")
+    draw_card((940, 150, 1220, 245), "Surveillance & OpenCV HUD", "• OpenCV 2D Bounding Boxes\n• People / Vehicles / Weapons\n• 1.0 Hz Event Timeline Grid", (30, 41, 59), (236, 72, 153), "VIDEO")
+    draw_card((1240, 150, 1530, 245), "Forensic AI Chatbot", "• Dual-Tier NLP Reasoner\n• One-Click Suggestion Chips\n• Temporal & Evidence Q&A", (30, 41, 59), (16, 185, 129), "CHAT")
 
     # Downward Connectors (Arrows)
     for cx in [205, 495, 785, 1080, 1385]:
@@ -67,9 +67,9 @@ def create_architecture_diagram():
 
     draw_card((70, 345, 340, 405), "/api/process/image", "POST: multipart image / path", (30, 41, 59), (14, 165, 233))
     draw_card((360, 345, 630, 405), "/api/analyze-audio", "POST: audio/wav or /mp3", (30, 41, 59), (168, 85, 247))
-    draw_card((650, 345, 920, 405), "/api/analyze-video", "POST: CCTV surveillance .mp4", (30, 41, 59), (236, 72, 153))
+    draw_card((650, 345, 920, 405), "/api/video/opencv-predict", "POST: OpenCV Video CV Engine", (30, 41, 59), (236, 72, 153))
     draw_card((940, 345, 1220, 405), "/api/process/complete", "POST: Unified multimodal fusion", (30, 41, 59), (245, 158, 11))
-    draw_card((1240, 345, 1530, 405), "/api/chat & /api/reports", "POST: Groq query | GET: PDF", (30, 41, 59), (16, 185, 129))
+    draw_card((1240, 345, 1530, 405), "/api/chat & /api/reports", "POST: Grounded Chat | GET: PDF", (30, 41, 59), (16, 185, 129))
 
     for cx in [205, 495, 785, 1080, 1385]:
         d.line([(cx, 420), (cx, 450)], fill=(129, 140, 248), width=3)
@@ -83,9 +83,9 @@ def create_architecture_diagram():
 
     draw_card((70, 510, 340, 670), "Vision Service", "• Model: PekingU/rtdetr_r50vd\n• Model: OpenAI CLIP ViT-B/32\n• Depth Map [X,Y,Z] Estimation\n• 2D Bounding Boxes & Confidence\n• Furniture / Weapon / Victim BBox\n• CV / Heuristic Fallback Engine", (30, 41, 59), (14, 165, 233), "VISION")
     draw_card((360, 510, 630, 670), "Audio Service", "• Model: OpenAI Whisper-Base\n• ASR Speech-to-Text Pipeline\n• Librosa Acoustic Energy\n• Forensic Crime Classification\n• Groq Multilingual Translation\n  (English, Hindi, Telugu, French)", (30, 41, 59), (168, 85, 247), "AUDIO")
-    draw_card((650, 510, 920, 670), "Video Service", "• OpenCV 1.0 Hz Frame Decomp\n• BLIP-2 Frame Captioning\n• Suspicious Motion Detector\n• Scene Intelligence Extractor\n• Second-by-Second Event Log\n• Normal vs Anomaly Scoring", (30, 41, 59), (236, 72, 153), "VIDEO")
+    draw_card((650, 510, 920, 670), "OpenCV Video Service", "• OpenCV Computer Vision Engine\n• People & Suspect Bounding Boxes\n• Vehicle & Getaway Car Tracking\n• Weapon & Object Identification\n• 3D Spatial Trajectory Mapping\n• Carjack / ATM / Store Scoring", (30, 41, 59), (236, 72, 153), "OPENCV")
     draw_card((940, 510, 1220, 670), "Fusion Service", "• Cross-Modal Entity Resolver\n• Unified Second Timeline Clock\n• Consistency Checker (Audio vs Vid)\n• Spatial-Temporal Fact Correlator\n• Contradiction Detection\n• Master Forensic Case Record", (30, 41, 59), (245, 158, 11), "FUSION")
-    draw_card((1240, 510, 1530, 670), "LLM & PDF Services", "• Groq LLaMA-3.3-70B API\n• Grounded Dialogue Reasoning\n• Forensic Scenario Deduction\n• ReportLab Platypus Engine\n• XML Escape Sanitizer\n• SHA-256 Validated Court PDF", (30, 41, 59), (16, 185, 129), "REPORTS")
+    draw_card((1240, 510, 1530, 670), "Dual-Tier Chat & PDF", "• Groq LLaMA-3.3-70B Cloud Model\n• Grounded Local Forensic Reasoner\n• One-Click Suggestion Chips\n• ReportLab Platypus Engine\n• XML Escape Sanitizer\n• SHA-256 Validated Court PDF", (30, 41, 59), (16, 185, 129), "CHAT/PDF")
 
     for cx in [205, 495, 785, 1080, 1385]:
         d.line([(cx, 690), (cx, 720)], fill=(52, 211, 153), width=3)
