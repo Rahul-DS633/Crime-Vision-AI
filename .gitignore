@@ -41,6 +41,9 @@ ENV/
 # Generated Forensic Sessions & PDF Reports (Keep sample assets, ignore runtime session dumps)
 backend/data/sessions/*.json
 backend/data/reports/*.pdf
+**/data/sessions/*.json
+**/data/reports/*.pdf
+**/data/uploads/*/[0-9]*_*
 
 # IDE & OS files
 .vscode/

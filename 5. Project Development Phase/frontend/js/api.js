@@ -41,10 +41,18 @@ class API {
   /**
    * 3. Direct Module Access (Fast Path)
    */
-  static async analyzeImage(file) {
+  static async analyzeImage(fileOrPath) {
+    if (typeof fileOrPath === 'string') {
+      const response = await fetch(`${API_BASE_URL}/process/image`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_path: fileOrPath })
+      });
+      return await response.json();
+    }
     const formData = new FormData();
-    if (file) {
-      formData.append('file', file);
+    if (fileOrPath instanceof File) {
+      formData.append('file', fileOrPath);
     }
     const response = await fetch(`${API_BASE_URL}/process/image`, {
       method: 'POST',
@@ -53,10 +61,18 @@ class API {
     return await response.json();
   }
 
-  static async analyzeAudio(file) {
+  static async analyzeAudio(fileOrPath) {
+    if (typeof fileOrPath === 'string') {
+      const response = await fetch(`${API_BASE_URL}/analyze-audio`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audio_path: fileOrPath })
+      });
+      return await response.json();
+    }
     const formData = new FormData();
-    if (file) {
-      formData.append('file', file);
+    if (fileOrPath instanceof File) {
+      formData.append('file', fileOrPath);
     }
     const response = await fetch(`${API_BASE_URL}/analyze-audio`, {
       method: 'POST',
@@ -65,10 +81,18 @@ class API {
     return await response.json();
   }
 
-  static async analyzeVideo(file) {
+  static async analyzeVideo(fileOrPath) {
+    if (typeof fileOrPath === 'string') {
+      const response = await fetch(`${API_BASE_URL}/analyze-video`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ video_path: fileOrPath })
+      });
+      return await response.json();
+    }
     const formData = new FormData();
-    if (file) {
-      formData.append('file', file);
+    if (fileOrPath instanceof File) {
+      formData.append('file', fileOrPath);
     }
     const response = await fetch(`${API_BASE_URL}/analyze-video`, {
       method: 'POST',

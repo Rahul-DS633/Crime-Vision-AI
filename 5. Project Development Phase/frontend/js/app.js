@@ -4,8 +4,9 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Initialize Components
-  const uploadPanel = new UploadPanel();
+  let videoScene3D = null;
   const scene3D = new Scene3D('threejsViewport');
+  videoScene3D = new VideoTrajectory3D('videoTrajectoryViewport');
   const timeline = new Timeline();
 
   const imageChat = new ChatHandler('image', 'imageChatInput', 'imageChatSendBtn', 'imageChatHistory');
@@ -14,6 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentMode = 'image';
   let activeSessionId = 'ready-state';
+  let currentVideoFrameDetections = [];
+
+  const uploadPanel = new UploadPanel(
+    (file, isPreset, presetPath) => startProcessing(file, isPreset, presetPath),
+    (mode) => switchMode(mode)
+  );
 
   // 2. Navigation Mode Switching
   const navButtons = {
@@ -49,13 +56,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const modeLabels = {
       image: 'Mode: Image Analysis',
       audio: 'Mode: Audio Analysis',
-      video: 'Mode: Video Analysis'
+      video: 'Mode: Video Analysis (3D Surveillance)'
     };
     if (modeBadge) modeBadge.textContent = modeLabels[mode];
 
-    // Trigger Three.js resize if image mode
+    // Trigger Three.js resize
     if (mode === 'image' && scene3D) {
       setTimeout(() => scene3D.onResize(), 100);
+    } else if (mode === 'video' && videoScene3D) {
+      setTimeout(() => videoScene3D.onResize(), 100);
     }
   }
 
@@ -101,6 +110,136 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Video Mode Toggle: 2D CCTV Feed vs 3D Spatial Trajectory
+  const videoView2dToggle = document.getElementById('videoView2dToggle');
+  const videoView3dToggle = document.getElementById('videoView3dToggle');
+  const video2dContainer = document.getElementById('video2dContainer');
+  const video3dContainer = document.getElementById('video3dContainer');
+
+  if (videoView2dToggle && videoView3dToggle) {
+    videoView2dToggle.addEventListener('click', () => {
+      videoView2dToggle.classList.add('active');
+      videoView3dToggle.classList.remove('active');
+      video2dContainer.classList.remove('hidden');
+      video3dContainer.classList.add('hidden');
+    });
+
+    videoView3dToggle.addEventListener('click', () => {
+      videoView3dToggle.classList.add('active');
+      videoView2dToggle.classList.remove('active');
+      video2dContainer.classList.add('hidden');
+      video3dContainer.classList.remove('hidden');
+      if (videoScene3D) {
+        setTimeout(() => videoScene3D.onResize(), 100);
+      }
+    });
+  }
+
+  // Video 3D Camera Controls
+  const btnCamCCTV = document.getElementById('btnCamCCTV');
+  const btnCamTopDown = document.getElementById('btnCamTopDown');
+  const btnCamOrbit = document.getElementById('btnCamOrbit');
+  const btnCamFollow = document.getElementById('btnCamFollow');
+  const btnCamResetVideo = document.getElementById('btnCamResetVideo');
+
+  function clearCamActive() {
+    [btnCamCCTV, btnCamTopDown, btnCamOrbit, btnCamFollow].forEach(b => b?.classList.remove('active'));
+  }
+
+  btnCamCCTV?.addEventListener('click', () => {
+    clearCamActive();
+    btnCamCCTV.classList.add('active');
+    videoScene3D?.setCCTVAngle();
+  });
+
+  btnCamTopDown?.addEventListener('click', () => {
+    clearCamActive();
+    btnCamTopDown.classList.add('active');
+    videoScene3D?.setTopDownView();
+  });
+
+  btnCamOrbit?.addEventListener('click', () => {
+    clearCamActive();
+    btnCamOrbit.classList.add('active');
+    videoScene3D?.setOrbitView();
+  });
+
+  btnCamFollow?.addEventListener('click', () => {
+    const isTracking = videoScene3D?.toggleTrackSuspect();
+    if (isTracking) {
+      clearCamActive();
+      btnCamFollow.classList.add('active');
+    } else {
+      btnCamFollow.classList.remove('active');
+    }
+  });
+
+  btnCamResetVideo?.addEventListener('click', () => {
+    clearCamActive();
+    btnCamCCTV?.classList.add('active');
+    videoScene3D?.resetCamera();
+  });
+
+  // Video Player Playback Time Sync & Live Bounding Box Overlay
+  const surveillanceVideoPlayer = document.getElementById('surveillanceVideoPlayer');
+  const videoBBoxOverlay = document.getElementById('videoBBoxOverlay');
+  const videoDurationTag = document.getElementById('videoDurationTag');
+
+  function formatTimeStr(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  if (surveillanceVideoPlayer) {
+    surveillanceVideoPlayer.addEventListener('timeupdate', () => {
+      const curTime = surveillanceVideoPlayer.currentTime;
+      const duration = surveillanceVideoPlayer.duration || 0;
+      if (videoDurationTag) {
+        videoDurationTag.textContent = `${formatTimeStr(curTime)} / ${formatTimeStr(duration)}`;
+      }
+
+      // Update 3D suspect position in Three.js synchronized with video
+      if (videoScene3D) {
+        videoScene3D.updatePlaybackTime(curTime);
+      }
+
+      // Render 2D bounding boxes for current second
+      renderVideoBoundingBoxes(curTime);
+    });
+  }
+
+  function renderVideoBoundingBoxes(currentTime) {
+    if (!videoBBoxOverlay) return;
+    videoBBoxOverlay.innerHTML = '';
+    const sec = Math.floor(currentTime);
+
+    const frameData = currentVideoFrameDetections.find(fd => fd.second === sec);
+    const detections = frameData ? frameData.detections : (currentVideoFrameDetections[0]?.detections || []);
+
+    detections.forEach(det => {
+      const box = det.box_normalized || [0.2, 0.2, 0.4, 0.4];
+      const left = box[0] * 100;
+      const top = box[1] * 100;
+      const width = (box[2] - box[0]) * 100;
+      const height = (box[3] - box[1]) * 100;
+
+      const rect = document.createElement('div');
+      rect.className = `bbox-rect ${det.label.toLowerCase().includes('suspect') ? 'weapon' : (det.label.toLowerCase().includes('person') ? 'human' : '')}`;
+      rect.style.left = `${left}%`;
+      rect.style.top = `${top}%`;
+      rect.style.width = `${width}%`;
+      rect.style.height = `${height}%`;
+
+      const label = document.createElement('div');
+      label.className = 'bbox-label';
+      label.textContent = `${det.label} ${Math.round((det.confidence || 0.9) * 100)}%`;
+      rect.appendChild(label);
+
+      videoBBoxOverlay.appendChild(rect);
+    });
+  }
+
   // Camera Reset & Fullscreen
   const resetCameraBtn = document.getElementById('resetCameraBtn');
   if (resetCameraBtn && scene3D) {
@@ -119,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. Start Processing Implementation (Matches Page 26)
+  // 5. Start Processing Implementation
   const startBtn = document.getElementById('startProcessingBtn');
   const spinner = document.getElementById('processSpinner');
   const processBtnText = document.getElementById('processBtnText');
@@ -128,9 +267,10 @@ document.addEventListener('DOMContentLoaded', () => {
     await startProcessing();
   });
 
-  async function startProcessing() {
-    const file = uploadPanel.getFiles();
-    const isPreset = uploadPanel.isPreset;
+  async function startProcessing(passedFile = null, isPresetDirect = false, presetPathDirect = null) {
+    const file = passedFile || uploadPanel.getFiles();
+    const isPreset = isPresetDirect || uploadPanel.isPreset;
+    const presetPath = presetPathDirect || uploadPanel.presetPath;
 
     // Show loading state
     startBtn.disabled = true;
@@ -139,14 +279,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       if (currentMode === 'image') {
-        const result = await API.analyzeImage(file);
-        updateImageFindings(result, file);
+        const payload = isPreset ? (presetPath || 'backend/data/uploads/image/real_street_traffic_surveillance.jpg') : file;
+        const result = await API.analyzeImage(payload);
+        updateImageFindings(result, file, isPreset ? payload : null);
       } else if (currentMode === 'audio') {
-        const result = await API.analyzeAudio(file);
-        updateAudioFindings(result, file);
+        const payload = isPreset ? (presetPath || 'backend/data/uploads/audio/case01_distress_call_911.wav') : file;
+        const result = await API.analyzeAudio(payload);
+        updateAudioFindings(result, file, isPreset ? payload : null);
       } else if (currentMode === 'video') {
-        const result = await API.analyzeVideo(file);
-        updateVideoFindings(result, file);
+        const payload = isPreset ? (presetPath || 'backend/data/uploads/video/real_cctv_surveillance_store.mp4') : file;
+        const result = await API.analyzeVideo(payload);
+        updateVideoFindings(result, file, isPreset ? payload : null);
       }
     } catch (err) {
       console.error("Analysis failed:", err);
@@ -160,16 +303,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 6. Update View Helpers
 
-  function updateImageFindings(result, file) {
+  function updateImageFindings(result, file, presetPath = null) {
     activeSessionId = result.session_id || 'session-image-01';
     document.getElementById('currentSessionId').textContent = activeSessionId.substring(0, 13);
     imageChat.setSessionId(activeSessionId);
 
     // Stats
-    document.getElementById('imgObjectsCount').textContent = result.objects_count || 9;
+    document.getElementById('imgObjectsCount').textContent = result.objects_count || (result.detections ? result.detections.length : 8);
     document.getElementById('imgPersonsCount').textContent = result.people_count || 1;
     document.getElementById('imgWeaponsCount').textContent = result.weapons_count || 1;
-    document.getElementById('imgLocationName').textContent = result.location || 'office';
+    document.getElementById('imgLocationName').textContent = result.location || 'Surveillance Zone';
 
     // Summaries
     if (result.ai_scene_summary) {
@@ -183,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Actions tags
     const actionsBox = document.getElementById('imageActionsTags');
     actionsBox.innerHTML = '';
-    (result.actions || ['lying down']).forEach(act => {
+    (result.actions || ['standing', 'surveillance detection']).forEach(act => {
       const span = document.createElement('span');
       span.className = 'tag-pill';
       span.textContent = act;
@@ -191,8 +334,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Evidence Facts
-    const facts = result.evidence_facts || ['laptop', 'diningtable', 'chair', 'Human', 'sofa', 'cup', 'knife', 'tape'];
-    document.getElementById('imageEvidenceFacts').textContent = facts.join(', ');
+    const facts = result.evidence_facts || listUniqueLabels(result.detections) || ['Human', 'Vehicle', 'Weapon'];
+    document.getElementById('imageEvidenceFacts').textContent = Array.isArray(facts) ? facts.join(', ') : facts;
 
     // Scenarios
     const scenariosList = document.getElementById('imageScenariosList');
@@ -210,18 +353,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 2D Annotated View
-    render2DAnnotations(result.detections, file);
+    render2DAnnotations(result.detections, file, presetPath);
   }
 
-  function render2DAnnotations(detections, file) {
+  function listUniqueLabels(detections) {
+    if (!detections) return [];
+    return Array.from(new Set(detections.map(d => d.label)));
+  }
+
+  function render2DAnnotations(detections, file, presetPath = null) {
     const previewImg = document.getElementById('evidenceImagePreview');
     const overlay = document.getElementById('boundingBoxOverlay');
     overlay.innerHTML = '';
 
     if (file && file instanceof File) {
       previewImg.src = URL.createObjectURL(file);
+    } else if (presetPath) {
+      const norm = presetPath.replace(/\\/g, '/');
+      const parts = norm.split('/data/');
+      previewImg.src = parts.length > 1 ? `/data/${parts[1]}` : (presetPath.startsWith('/') ? presetPath : `/${presetPath}`);
     } else {
-      previewImg.src = '/data/uploads/image/sample_crime_scene.jpg';
+      previewImg.src = '/data/uploads/image/real_street_traffic_surveillance.jpg';
     }
 
     (detections || []).forEach(det => {
@@ -247,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function updateAudioFindings(result, file) {
+  function updateAudioFindings(result, file, presetPath = null) {
     activeSessionId = result.session_id || 'session-audio-01';
     document.getElementById('currentSessionId').textContent = activeSessionId.substring(0, 13);
     audioChat.setSessionId(activeSessionId);
@@ -256,12 +408,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioPlayer = document.getElementById('audioPlayer');
     if (file && file instanceof File) {
       audioPlayer.src = URL.createObjectURL(file);
+    } else if (presetPath) {
+      const norm = presetPath.replace(/\\/g, '/');
+      const parts = norm.split('/data/');
+      audioPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : (presetPath.startsWith('/') ? presetPath : `/${presetPath}`);
     } else if (result.audio_path) {
       const norm = result.audio_path.replace(/\\/g, '/');
       const parts = norm.split('/data/');
-      audioPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : '/data/uploads/audio/sample_robbery_witness.mp3';
+      audioPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : '/data/uploads/audio/case01_distress_call_911.wav';
     } else {
-      audioPlayer.src = '/data/uploads/audio/sample_robbery_witness.mp3';
+      audioPlayer.src = '/data/uploads/audio/case01_distress_call_911.wav';
     }
     audioPlayer.load();
 
@@ -296,23 +452,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function updateVideoFindings(result, file) {
+  function updateVideoFindings(result, file, presetPath = null) {
     activeSessionId = result.session_id || 'session-video-01';
     document.getElementById('currentSessionId').textContent = activeSessionId.substring(0, 13);
     videoChat.setSessionId(activeSessionId);
+
+    // Store frame detections for real-time video bounding boxes overlay
+    currentVideoFrameDetections = result.frame_detections || [];
+
+    // Load 3D spatial trajectory and camera extrinsics into Three.js
+    if (videoScene3D && result.spatial_3d_trajectory) {
+      videoScene3D.loadTrajectoryData(result.spatial_3d_trajectory);
+    }
 
     // Video Player Source
     const videoPlayer = document.getElementById('surveillanceVideoPlayer');
     if (file && file instanceof File) {
       videoPlayer.src = URL.createObjectURL(file);
+    } else if (presetPath) {
+      const norm = presetPath.replace(/\\/g, '/');
+      const parts = norm.split('/data/');
+      videoPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : (presetPath.startsWith('/') ? presetPath : `/${presetPath}`);
     } else if (result.video_path) {
       const norm = result.video_path.replace(/\\/g, '/');
       const parts = norm.split('/data/');
-      videoPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : '/data/uploads/video/sample_surveillance_store.mp4';
+      videoPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : '/data/uploads/video/real_cctv_surveillance_store.mp4';
     } else {
-      videoPlayer.src = '/data/uploads/video/sample_surveillance_store.mp4';
+      videoPlayer.src = '/data/uploads/video/real_cctv_surveillance_store.mp4';
     }
     videoPlayer.load();
+
+    // Render initial bounding boxes
+    renderVideoBoundingBoxes(0);
 
     // Classification Badge
     const badge = document.getElementById('videoClassificationBadge');

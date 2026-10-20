@@ -30,8 +30,8 @@ class VideoService:
         # 1. Extract frames at 1Hz
         frames, duration, width, height = extract_frames(video_path, target_fps=1.0)
         
-        # 2. Sequential frame object detection
-        frame_detections = detect_objects_in_frames(frames)
+        # 2. Sequential frame object detection & 3D spatial trajectory
+        frame_detections, spatial_3d_trajectory = detect_objects_in_frames(frames)
         aggregated = aggregate_objects(frame_detections)
 
         # 3. Caption frames and generate visual summary
@@ -45,7 +45,7 @@ class VideoService:
         timeline_res = build_timeline(captions, frame_detections, duration=duration)
 
         scene_intelligence = {
-            "objects_detect": "refrigerator, handbag, orange, backpack, donut",
+            "objects_detect": aggregated.get("objects_str", "refrigerator, handbag, orange, backpack, donut, Human"),
             "people_count": aggregated.get("max_people", 2),
             "location": classification.get("location", "Shopping mall store"),
             "action": classification.get("action", "none")
@@ -61,6 +61,8 @@ class VideoService:
             "ai_visual_summary": ai_summary,
             "timeline": timeline_res.get("timeline", []),
             "unique_objects": aggregated.get("unique_objects", []),
+            "spatial_3d_trajectory": spatial_3d_trajectory,
+            "frame_detections": frame_detections,
             "processing_time": round(time.time() - start_t, 2)
         }
 
