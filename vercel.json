@@ -1,9 +1,4 @@
 {
   "version": 2,
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/5. Project Development Phase/frontend/$1"
-    }
-  ]
+  "cleanUrls": true
 }

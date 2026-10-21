@@ -1,18 +1,670 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=5.%20Project%20Development%20Phase/frontend/index.html">
-    <title>CrimeVision AI — Intelligent Multimodal Forensic Platform</title>
-    <script>
-        window.location.replace("5. Project Development Phase/frontend/index.html");
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrimeVision AI – Intelligent Multimodal Forensic Analysis Platform</title>
+  <meta name="description" content="Advanced multimodal forensic intelligence platform for crime scene reconstruction, 3D spatial mapping, audio transcription, video timelines, and Groq-powered reasoning.">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Three.js for 3D Scene Reconstruction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
-<body style="background:#090d16; color:#94a3b8; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0;">
-    <div style="text-align:center;">
-        <h2>Loading CrimeVision AI...</h2>
-        <p>If not redirected automatically, <a href="5.%20Project%20Development%20Phase/frontend/index.html" style="color:#00ffcc;">click here to enter CrimeVision AI</a>.</p>
+<body class="dark-theme">
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-shield">
+        <i class="fa-solid fa-fingerprint"></i>
+      </div>
+      <div class="header-titles">
+        <h1 class="platform-title">CrimeVision AI – Intelligent Multimodal Forensic Analysis Platform</h1>
+        <span class="sub-badge"><i class="fa-solid fa-shield-halved"></i> Automated Forensic Decision Support System</span>
+      </div>
     </div>
+    <div class="header-right">
+      <div class="system-status">
+        <span class="status-dot"></span>
+        <span class="status-text" id="systemHealthText">AI Engine Ready</span>
+      </div>
+      <div class="mode-badge-pill" id="currentModeBadge">Mode: Image Analysis</div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-layout">
+    
+    <!-- LEFT SIDEBAR: Navigation & Upload Panel -->
+    <aside class="sidebar-panel">
+      <!-- Mode Selection Tabs -->
+      <div class="nav-section">
+        <div class="section-title">ANALYSIS MODES</div>
+        <div class="nav-buttons">
+          <button class="nav-btn active" id="navImageBtn" data-mode="image">
+            <i class="fa-regular fa-image"></i>
+            <span>Image Analysis</span>
+          </button>
+          <button class="nav-btn" id="navAudioBtn" data-mode="audio">
+            <i class="fa-solid fa-microphone-lines"></i>
+            <span>Audio Analysis</span>
+          </button>
+          <button class="nav-btn" id="navVideoBtn" data-mode="video">
+            <i class="fa-solid fa-video"></i>
+            <span>Video Analysis</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Upload Evidence Card -->
+      <div class="upload-card">
+        <div class="card-header">
+          <i class="fa-solid fa-file-arrow-up text-primary"></i>
+          <h3 id="uploadTitle">Upload Evidence</h3>
+        </div>
+
+        <div class="drop-zone" id="dropZone" title="Drop file here for instant auto-detection & processing">
+          <input type="file" id="fileInput" class="file-input" accept="image/*,video/*,audio/*">
+          <div class="drop-content">
+            <div class="upload-icon-circle">
+              <i class="fa-solid fa-cloud-arrow-up" id="uploadIcon"></i>
+            </div>
+            <p class="drop-prompt" id="dropPrompt">Drag & Drop Evidence</p>
+            <p class="drop-sub" id="dropSub">Auto-detects Video, Audio, or Images (Processes instantly)</p>
+          </div>
+        </div>
+
+        <!-- Selected File Status Info -->
+        <div class="file-status-pill hidden" id="fileStatusPill">
+          <i class="fa-solid fa-paperclip"></i>
+          <span class="file-name" id="fileNameDisplay">crime-scene-investigation.jpg</span>
+          <button class="remove-file-btn" id="removeFileBtn" title="Clear file">&times;</button>
+        </div>
+
+        <!-- Start Processing Action Button -->
+        <button class="btn-primary" id="startProcessingBtn">
+          <i class="fa-solid fa-bolt-lightning"></i>
+          <span id="processBtnText">Start Processing</span>
+          <div class="spinner hidden" id="processSpinner"></div>
+        </button>
+
+        <!-- Real-Life Datasets Quick Presets Section -->
+        <div class="preset-section-header" style="font-size: 11px; font-weight: 700; color: #94a3b8; margin: 8px 0 4px; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-database text-primary"></i>
+          <span>REAL-LIFE SURVEILLANCE SAMPLES</span>
+        </div>
+        <div class="preset-buttons-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+          <button class="btn-preset-mini" id="presetStoreCctvBtn" title="Real Store CCTV 65s (Intel Surveillance)">
+            <i class="fa-solid fa-video text-danger"></i>
+            <span>Real Store CCTV</span>
+          </button>
+          <button class="btn-preset-mini" id="presetTrafficCctvBtn" title="Real Intersection Traffic CCTV (54s)">
+            <i class="fa-solid fa-traffic-light text-warning"></i>
+            <span>Traffic CCTV</span>
+          </button>
+          <button class="btn-preset-mini" id="presetRealImageBtn" title="Real Surveillance Crime Image">
+            <i class="fa-solid fa-image text-info"></i>
+            <span>Street Image</span>
+          </button>
+          <button class="btn-preset-mini" id="presetRealAudioBtn" title="Real 911 Distress Audio">
+            <i class="fa-solid fa-microphone-lines text-success"></i>
+            <span>911 Distress Audio</span>
+          </button>
+        </div>
+
+        <!-- Preloaded Benchmark Evidence Button -->
+        <button class="btn-preset" id="presetEvidenceBtn" style="margin-top: 6px;">
+          <i class="fa-solid fa-folder-open"></i>
+          <span>Standard Case Benchmarks</span>
+        </button>
+      </div>
+
+      <!-- Evidence Quick Stats / Case Info -->
+      <div class="case-meta-card">
+        <div class="meta-row">
+          <span class="meta-label">Investigator</span>
+          <span class="meta-value">Rahul Rajak</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Inference Engine</span>
+          <span class="meta-value" id="engineInfo">RT-DETR + Groq Llama-3</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Session ID</span>
+          <span class="meta-value font-mono" id="currentSessionId">Ready</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER & RIGHT DYNAMIC VIEWPORTS -->
+    <section class="content-viewport">
+
+      <!-- ================= 1. IMAGE ANALYSIS VIEW ================= -->
+      <div class="mode-view active" id="imageView">
+        <div class="center-stage">
+          <!-- 3D Scene Reconstruction / 2D Canvas -->
+          <div class="stage-card">
+            <div class="stage-header">
+              <div class="stage-title">
+                <i class="fa-solid fa-cube text-primary"></i>
+                <span>3D Scene Reconstruction</span>
+              </div>
+              <div class="stage-controls">
+                <button class="stage-toggle-btn active" id="view3dToggle" title="Interactive 3D Mesh">3D Mesh</button>
+                <button class="stage-toggle-btn" id="view2dToggle" title="Annotated 2D Detection">2D Boxes</button>
+                <button class="icon-tool-btn" id="resetCameraBtn" title="Reset Camera View"><i class="fa-solid fa-rotate-right"></i></button>
+                <button class="icon-tool-btn" id="fullscreen3dBtn" title="Fullscreen"><i class="fa-regular fa-square"></i></button>
+              </div>
+            </div>
+
+            <!-- Viewport Container for Three.js & Image Overlay -->
+            <div class="viewport-canvas-container" id="canvas3dContainer">
+              <div id="threejsViewport" class="threejs-canvas"></div>
+              
+              <!-- 2D Image with Bounding Box Overlay (hidden by default until toggled) -->
+              <div id="imageAnnotatedView" class="image-2d-canvas hidden">
+                <img id="evidenceImagePreview" src="" alt="Crime Scene Evidence">
+                <div id="boundingBoxOverlay" class="box-overlay-layer"></div>
+              </div>
+
+              <!-- 3D HUD controls helper -->
+              <div class="hud-helper">
+                <span><i class="fa-solid fa-mouse"></i> Left Click: Orbit</span>
+                <span><i class="fa-solid fa-arrows-up-down-left-right"></i> Right Click: Pan</span>
+                <span><i class="fa-solid fa-circle-dot"></i> Scroll: Zoom</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Evidence Panel: Image Mode -->
+        <div class="right-panel">
+          <div class="panel-card">
+            <div class="panel-header">
+              <i class="fa-solid fa-clipboard-list text-primary"></i>
+              <h3>Evidence Analysis</h3>
+            </div>
+
+            <!-- AI Scene Summary -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-wand-magic-sparkles text-primary"></i> AI SCENE SUMMARY</div>
+              <div class="ai-summary-content" id="aiSceneSummaryBox">
+                <p class="summary-line"><strong>Summary Type:</strong> <span id="imageSummaryType">Awaiting Analysis</span></p>
+                <p class="summary-line"><strong>Brief Description:</strong> <span id="imageBriefDesc">Upload or select an image to generate real-time AI scene analysis.</span></p>
+              </div>
+            </div>
+
+            <!-- Visual Summary -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-eye text-primary"></i> VISUAL SUMMARY</div>
+              <p class="insight-text" id="imageVisualSummary">
+                No image analyzed yet. Click "Start Processing" to begin.
+              </p>
+            </div>
+
+            <!-- Quick Metrics Grid (Objects, Persons, Weapons, Location) -->
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <i class="fa-solid fa-shapes metric-icon"></i>
+                <div class="metric-val" id="imgObjectsCount">0</div>
+                <div class="metric-title">Objects</div>
+              </div>
+              <div class="metric-box">
+                <i class="fa-solid fa-user-group metric-icon"></i>
+                <div class="metric-val" id="imgPersonsCount">0</div>
+                <div class="metric-title">Persons</div>
+              </div>
+              <div class="metric-box">
+                <i class="fa-solid fa-crosshairs metric-icon text-danger"></i>
+                <div class="metric-val text-danger" id="imgWeaponsCount">0</div>
+                <div class="metric-title">Weapons</div>
+              </div>
+              <div class="metric-box">
+                <i class="fa-solid fa-location-dot metric-icon text-success"></i>
+                <div class="metric-val" id="imgLocationName">Awaiting</div>
+                <div class="metric-title">Location</div>
+              </div>
+            </div>
+
+            <!-- Actions Detected -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-bolt text-warning"></i> ACTIONS DETECTED</div>
+              <div class="pill-tags" id="imageActionsTags">
+                <span class="tag-pill">awaiting input</span>
+              </div>
+            </div>
+
+            <!-- Evidence Facts -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-tags text-primary"></i> EVIDENCE FACTS</div>
+              <p class="insight-text font-mono" id="imageEvidenceFacts">
+                Awaiting evidence ingestion...
+              </p>
+            </div>
+
+            <!-- AI Application Scenarios -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-lightbulb text-info"></i> AI APPLICATION SCENARIOS</div>
+              <div class="scenarios-list" id="imageScenariosList">
+                <div class="scenario-card">
+                  <strong>Scenario 1:</strong> The man was attacked by an unknown assailant while working late in the office, and the perpetrator used the knife to inflict fatal wounds before fleeing the scene.
+                </div>
+                <div class="scenario-card">
+                  <strong>Scenario 2:</strong> The individual, feeling overwhelmed by stress, attempted to harm himself with the knife but was unable to complete the act and lies there, awaiting help, with the tape possibly being used in a misguided attempt to treat the wound.
+                </div>
+                <div class="scenario-card">
+                  <strong>Scenario 3:</strong> The person staged a crime scene to mislead investigators, strategically placing the knife and tape to create the illusion of a violent struggle, but ultimately fell asleep or lost consciousness on the floor.
+                </div>
+              </div>
+            </div>
+
+            <!-- Download PDF Report Button -->
+            <button class="btn-pdf" id="downloadImagePdfBtn">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Download PDF Report</span>
+            </button>
+
+            <!-- Ask AI about this Image -->
+            <div class="chat-section">
+              <div class="chat-header">
+                <i class="fa-solid fa-robot text-primary"></i>
+                <span>Ask AI about this Image</span>
+              </div>
+              <div class="chat-history" id="imageChatHistory">
+                <div class="chat-msg ai-msg">
+                  <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                  <div class="msg-body">
+                    The scene summary is: "A male individual is observed lying on the floor, surrounded by a knife and restrained with tape." The location is an office. One person is detected, and bloodstains are present.
+                  </div>
+                </div>
+              </div>
+              <div class="chat-suggestions" id="imageChatSuggestions">
+                <button class="chat-chip" data-q="What objects were detected?">Objects?</button>
+                <button class="chat-chip" data-q="Were any weapons found?">Weapons?</button>
+                <button class="chat-chip" data-q="How many people are present?">People?</button>
+                <button class="chat-chip" data-q="What is the scene location?">Location?</button>
+              </div>
+              <div class="chat-input-bar">
+                <input type="text" id="imageChatInput" placeholder="Ask a question about the evidence..." autocomplete="off">
+                <button class="chat-send-btn" id="imageChatSendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 2. AUDIO ANALYSIS VIEW ================= -->
+      <div class="mode-view" id="audioView">
+        <div class="center-stage">
+          <!-- Audio Evidence Player Card -->
+          <div class="stage-card mb-4">
+            <div class="stage-header">
+              <div class="stage-title">
+                <i class="fa-solid fa-microphone-lines text-primary"></i>
+                <span>Audio Evidence & Acoustic Forensics</span>
+              </div>
+              <div class="audio-meta-tag font-mono" id="audioDurationTag" style="color: #60a5fa; font-weight: 700; background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 4px;">0:00 / 0:25</div>
+            </div>
+
+            <div class="audio-player-card-body" style="background: #090d16; border: 1px solid #1e293b; border-radius: 8px; padding: 18px;">
+              <!-- Dynamic Equalizer Waveform Visualizer -->
+              <div class="audio-waveform-container" id="audioWaveformVisualizer" style="display: flex; align-items: center; justify-content: center; gap: 4px; height: 50px; margin-bottom: 16px; background: rgba(15, 23, 42, 0.6); border-radius: 6px; padding: 0 12px; overflow: hidden;">
+                <!-- 28 animated waveform bars generated dynamically in JS -->
+              </div>
+
+              <!-- Audio Info & Status Bar -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 11px; font-family: monospace; color: #94a3b8;">
+                <span id="audioTrackName" style="color: #38bdf8; font-weight: 700;"><i class="fa-solid fa-tape"></i> 911 EMERGENCY DISPATCH & WITNESS RECORDING</span>
+                <span id="audioSamplingBadge" style="color: #10b981; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 3px;">44.1 kHz • PCM 16-BIT</span>
+              </div>
+
+              <!-- Custom Transport Controls Bar -->
+              <div class="custom-audio-transport" style="display: flex; align-items: center; gap: 14px;">
+                <button id="customAudioPlayBtn" class="btn-play-audio" style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; color: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(37, 99, 235, 0.5); transition: all 0.2s;">
+                  <i class="fa-solid fa-play" id="customPlayIcon" style="margin-left: 2px;"></i>
+                </button>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: monospace; color: #cbd5e1;">
+                    <span id="audioCurrentTimeText">0:00</span>
+                    <span id="audioTotalTimeText">0:25</span>
+                  </div>
+                  <input type="range" id="audioSeekBar" min="0" max="100" value="0" style="width: 100%; accent-color: #3b82f6; cursor: pointer;">
+                </div>
+                <button id="audioSpeedToggleBtn" style="background: #1e293b; border: 1px solid #334155; color: #93c5fd; font-size: 11px; font-family: monospace; font-weight: 700; padding: 6px 10px; border-radius: 4px; cursor: pointer;">1.0x</button>
+              </div>
+
+              <!-- Native Audio Element -->
+              <audio id="audioPlayer" preload="auto" style="display: none;"></audio>
+            </div>
+          </div>
+
+          <!-- Live Transcript Card -->
+          <div class="stage-card mb-4">
+            <div class="stage-header">
+              <div class="stage-title">
+                <i class="fa-solid fa-file-lines text-primary"></i>
+                <span>Live Speech-to-Text Transcript</span>
+              </div>
+              <span id="whisperModelBadge" class="font-mono text-xs" style="color: #a78bfa; background: rgba(167, 139, 250, 0.15); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;">WHISPER-BASE MULTILINGUAL</span>
+            </div>
+            <!-- Processing Indicator Banner -->
+            <div id="audioProcessingBanner" class="hidden" style="background: rgba(59, 130, 246, 0.15); border: 1px dashed #3b82f6; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; color: #93c5fd; font-size: 12px;">
+              <i class="fa-solid fa-circle-notch fa-spin text-primary"></i>
+              <span>Transcribing Speech with Whisper Speech-to-Text Engine...</span>
+            </div>
+            <div class="transcript-box" id="liveTranscriptBox">
+              <p class="transcript-text" id="audioTranscriptText">
+                Upload an audio recording or select a preset to generate an automated Whisper forensic transcript.
+              </p>
+            </div>
+          </div>
+
+          <!-- AI Intelligence Report Card -->
+          <div class="stage-card">
+            <div class="stage-header">
+              <div class="stage-title">
+                <i class="fa-solid fa-brain text-primary"></i>
+                <span>AI Intelligence Report</span>
+              </div>
+              <div class="badges-row">
+                <span class="crime-badge warning" id="audioCrimeBadge">AWAITING</span>
+                <span class="crime-badge success" id="audioLocationBadge">AUDIO</span>
+              </div>
+            </div>
+            
+            <div class="intelligence-summary-box">
+              <div class="ai-summary-pill"><i class="fa-solid fa-quote-left"></i> AI SUMMARY</div>
+              <p class="summary-paragraph" id="audioAiSummary">
+                "Upload or select an audio file to extract forensic facts, suspect descriptions, and chronological event timelines."
+              </p>
+            </div>
+
+            <!-- Transcripts & Translations Multi-Tab -->
+            <div class="translations-container">
+              <div class="translations-header">
+                <i class="fa-solid fa-language text-warning"></i>
+                <span>Transcripts & Translations:</span>
+              </div>
+              <div class="lang-tabs">
+                <button class="lang-tab active" data-lang="english">English</button>
+                <button class="lang-tab" data-lang="hindi">Hindi</button>
+                <button class="lang-tab" data-lang="telugu">Telugu</button>
+                <button class="lang-tab" data-lang="french">French</button>
+              </div>
+              <div class="translation-content-box">
+                <p id="translationOutputText" class="translation-text">
+                  Upload an audio file to generate multilingual transcripts across English, Hindi, Telugu, and French.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Audio Timeline & Chat -->
+        <div class="right-panel">
+          <div class="panel-card">
+            <div class="panel-header">
+              <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+              <h3>AI Generated Crime Event Timeline</h3>
+            </div>
+            <p class="panel-subtitle">From witness audio statement</p>
+
+            <!-- Audio Timeline Table -->
+            <div class="timeline-table-wrapper">
+              <table class="timeline-table" id="audioTimelineTable">
+                <thead>
+                  <tr>
+                    <th style="width: 25%">Time</th>
+                    <th>Event</th>
+                  </tr>
+                </thead>
+                <tbody id="audioTimelineBody">
+                  <tr>
+                    <td class="time-col">--:--</td>
+                    <td>Awaiting audio analysis...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Download PDF Report -->
+            <button class="btn-pdf" id="downloadAudioPdfBtn">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Download PDF Report</span>
+            </button>
+
+            <!-- Ask AI about this Audio -->
+            <div class="chat-section">
+              <div class="chat-header">
+                <i class="fa-solid fa-robot text-primary"></i>
+                <span>Ask AI about this Audio</span>
+              </div>
+              <div class="chat-history" id="audioChatHistory">
+                <div class="chat-msg ai-msg">
+                  <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                  <div class="msg-body">
+                    I've analyzed the audio transcript and timeline. Ask me anything about the events detected!
+                  </div>
+                </div>
+              </div>
+              <div class="chat-suggestions" id="audioChatSuggestions">
+                <button class="chat-chip" data-q="What was said in the audio?">What was said?</button>
+                <button class="chat-chip" data-q="What is the acoustic distress level?">Distress level?</button>
+                <button class="chat-chip" data-q="Who is the suspect?">Suspect?</button>
+                <button class="chat-chip" data-q="Was a getaway car mentioned?">Getaway car?</button>
+              </div>
+              <div class="chat-input-bar">
+                <input type="text" id="audioChatInput" placeholder="Ask about suspect, time, location..." autocomplete="off">
+                <button class="chat-send-btn" id="audioChatSendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 3. VIDEO ANALYSIS VIEW ================= -->
+      <div class="mode-view" id="videoView">
+        <div class="center-stage">
+          <!-- Video Evidence Player Card with 2D/3D Mode Toggle -->
+          <div class="stage-card mb-4">
+            <div class="stage-header">
+              <div class="stage-title">
+                <i class="fa-solid fa-video text-primary"></i>
+                <span>Surveillance Evidence & 3D Spatial Reconstruction</span>
+              </div>
+              <div class="view-toggle-group">
+                <button class="toggle-btn active" id="videoView2dToggle" title="2D CCTV Camera Stream with Real-time AI Bounding Boxes">
+                  <i class="fa-solid fa-video"></i>
+                  <span>2D CCTV Feed</span>
+                </button>
+                <button class="toggle-btn" id="videoView3dToggle" title="3D Spatial Suspect Trajectory & Camera Projection View">
+                  <i class="fa-solid fa-cube"></i>
+                  <span>🌐 3D Spatial Trajectory</span>
+                </button>
+              </div>
+              <div class="video-meta-tag font-mono" id="videoDurationTag">0:00 / 0:21</div>
+            </div>
+
+            <!-- 2D CCTV Video View with Real-time Bounding Box Overlay -->
+            <div class="video-player-container" id="video2dContainer" style="position: relative;">
+              <video id="surveillanceVideoPlayer" class="surveillance-video" controls playsinline preload="metadata">
+                <source src="/data/uploads/video/real_cctv_surveillance_store.mp4" type="video/mp4">
+                Your browser does not support video playback.
+              </video>
+              <div id="videoBBoxOverlay" class="box-overlay-layer"></div>
+              <div class="video-hud-overlay">
+                <span class="rec-badge"><i class="fa-solid fa-circle"></i> CAM-04 REC</span>
+                <span class="hud-location">STORE AISLE SURVEILLANCE</span>
+                <span class="hud-fps font-mono" style="color: #60a5fa; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 4px;">1.0 FPS AI SYNC</span>
+              </div>
+            </div>
+
+            <!-- 3D Spatial Trajectory Viewport -->
+            <div class="canvas-3d-wrapper hidden" id="video3dContainer" style="height: 480px; position: relative; overflow: hidden; border-radius: 8px; background: #070b14; border: 1px solid #1e293b;">
+              <div id="videoTrajectoryViewport" class="three-viewport" style="width: 100%; height: 100%;"></div>
+
+              <div class="canvas-floating-controls">
+                <button class="cam-ctrl-btn active" id="btnCamCCTV" title="CCTV Camera Perspective"><i class="fa-solid fa-video"></i> CCTV Angle</button>
+                <button class="cam-ctrl-btn" id="btnCamTopDown" title="Top-Down Bird's Eye View (Tactical Map)"><i class="fa-solid fa-map"></i> Top-Down 2D</button>
+                <button class="cam-ctrl-btn" id="btnCamOrbit" title="3D Free Orbit Look"><i class="fa-solid fa-arrows-spin"></i> 3D Orbit</button>
+                <button class="cam-ctrl-btn" id="btnCamFollow" title="Lock & Follow Suspect"><i class="fa-solid fa-crosshairs"></i> Track Suspect</button>
+                <button class="cam-ctrl-btn" id="btnCamResetVideo" title="Reset View"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+              </div>
+
+              <!-- Suspect 3D Telemetry HUD -->
+              <div class="video-3d-hud" style="position: absolute; bottom: 12px; left: 12px; background: rgba(7, 11, 20, 0.9); backdrop-filter: blur(8px); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 8px; padding: 10px 14px; font-family: monospace; font-size: 11px; color: #94a3b8; pointer-events: none; z-index: 10;">
+                <div style="color: #38bdf8; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                  <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444;"></span>
+                  <span>SUSPECT #1 SPATIAL TELEMETRY</span>
+                </div>
+                <div>Position: <span id="telemetryPos" style="color: #f1f5f9; font-weight: 700;">X: -3.20m, Z: -4.20m</span></div>
+                <div>Status: <span id="telemetryStatus" style="color: #f59e0b; font-weight: 700;">Entering Scene</span></div>
+                <div>Speed: <span id="telemetrySpeed" style="color: #10b981; font-weight: 700;">0.92 m/s</span></div>
+                <div>Traversed: <span id="telemetryDist" style="color: #38bdf8; font-weight: 700;">0.0 m</span></div>
+              </div>
+
+              <div class="hud-helper" style="bottom: 12px; right: 12px; left: auto;">
+                <span><i class="fa-solid fa-mouse"></i> Orbit</span>
+                <span><i class="fa-solid fa-arrows-up-down-left-right"></i> Pan</span>
+                <span><i class="fa-solid fa-circle-dot"></i> Zoom</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Scene Intelligence & Classification Card -->
+          <div class="stage-card">
+            <div class="stage-header">
+              <div class="classification-pill-badge" id="videoClassificationBadge">
+                NORMAL ACTIVITY (90%)
+              </div>
+              <span class="classification-reason" id="videoClassificationReason">Reason: No explicit crime committed</span>
+            </div>
+
+            <!-- AI Visual Summary -->
+            <div class="insight-block">
+              <div class="block-label"><i class="fa-solid fa-film text-primary"></i> AI Visual Summary</div>
+              <p class="insight-text leading-relaxed" id="videoVisualSummaryText">
+                Upload or select surveillance video footage to generate an automated OpenCV forensic visual analysis.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Video Scene Intelligence & Second-by-Second Event Timeline -->
+        <div class="right-panel">
+          <div class="panel-card">
+            <div class="panel-header">
+              <i class="fa-solid fa-layer-group text-primary"></i>
+              <h3>Scene Intelligence</h3>
+            </div>
+
+            <!-- Intelligence Details -->
+            <div class="scene-intel-grid">
+              <div class="intel-item">
+                <span class="intel-label">Objects Detect</span>
+                <span class="intel-val" id="videoObjectsDetect">Awaiting video input</span>
+              </div>
+              <div class="intel-item">
+                <span class="intel-label">People Count</span>
+                <span class="intel-val" id="videoPeopleCount">0</span>
+              </div>
+              <div class="intel-item">
+                <span class="intel-label">Vehicles Count</span>
+                <span class="intel-val" id="videoVehiclesCount">0</span>
+              </div>
+              <div class="intel-item">
+                <span class="intel-label">Location</span>
+                <span class="intel-val" id="videoLocation">Awaiting</span>
+              </div>
+              <div class="intel-item">
+                <span class="intel-label">Action</span>
+                <span class="intel-val" id="videoAction">none</span>
+              </div>
+            </div>
+
+            <!-- Event Timeline (Second by Second) -->
+            <div class="timeline-section-header">
+              <div class="timeline-title-row">
+                <i class="fa-solid fa-timeline text-primary"></i>
+                <h4>Event Timeline</h4>
+              </div>
+              <span class="timeline-tip">Click any second to jump video</span>
+            </div>
+
+            <div class="timeline-table-wrapper video-timeline-scroll">
+              <table class="timeline-table" id="videoTimelineTable">
+                <thead>
+                  <tr>
+                    <th style="width: 25%">Time</th>
+                    <th>Event</th>
+                  </tr>
+                </thead>
+                <tbody id="videoTimelineBody">
+                  <tr>
+                    <td class="time-col">--:--</td>
+                    <td>Awaiting video processing to extract second-by-second timeline...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Download PDF Report -->
+            <button class="btn-pdf" id="downloadVideoPdfBtn">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Download PDF Report</span>
+            </button>
+
+            <!-- Ask AI about the Video Chatbot -->
+            <div class="chat-section">
+              <div class="chat-header">
+                <i class="fa-solid fa-robot text-primary"></i>
+                <span>Ask AI about the Video</span>
+              </div>
+              <div class="chat-history" id="videoChatHistory">
+                <div class="chat-msg ai-msg">
+                  <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                  <div class="msg-body">
+                    I've analyzed the video scene and timeline. Ask me anything about the actions or objects detected!
+                  </div>
+                </div>
+              </div>
+              <div class="chat-suggestions" id="videoChatSuggestions">
+                <button class="chat-chip" data-q="Who was there?">Who was there?</button>
+                <button class="chat-chip" data-q="What vehicles were detected?">Vehicles?</button>
+                <button class="chat-chip" data-q="What happened at 5s?">At 5s?</button>
+                <button class="chat-chip" data-q="What objects were detected?">Objects?</button>
+                <button class="chat-chip" data-q="What is the crime classification and threat level?">Threat level?</button>
+              </div>
+              <div class="chat-input-bar">
+                <input type="text" id="videoChatInput" placeholder="e.g. who was there at 5s?" autocomplete="off">
+                <button class="chat-send-btn" id="videoChatSendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/scene_3d.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/chat_handler.js"></script>
+  <script src="js/upload_panel.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
