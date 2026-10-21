@@ -9,12 +9,13 @@
 
 ## 📋 Video Recording Checklist & Preparation Before Starting
 
-1. **Browser Tab:** Open `http://localhost:5000` in Google Chrome or Edge. Ensure it is full-screen (`F11` or maximized).
+1. **Browser Tab:** Open the live deployed cloud platform at **`https://crime-vision-ai-frontend.vercel.app/`** (or local `http://localhost:5000`) in Google Chrome or Edge. Ensure it is full-screen (`F11` or maximized).
 2. **Audio Check:** Ensure your microphone is clear, noise-cancelled, and at a comfortable volume.
-3. **Sample Files Ready:**
-   - Sample Video: `backend/data/uploads/video/case01_bank_atm_assault.mp4` or `case02_parking_lot_carjack.mp4`
-   - Sample Audio: `backend/data/uploads/audio/case02_gunfire_and_sirens.wav` or `case01_distress_call_911.wav`
-   - Sample Image: `backend/data/uploads/image/sample_crime_scene.jpg`
+3. **Sample Dataset Ready:**
+   - Click the in-app **"Sample Dataset Library (14 Cases)"** button or access files directly from `samples_dataset/`:
+     - Sample Video: `real_cctv_surveillance_store.mp4` or `armed_robbery_cctv.mp4`
+     - Sample Audio: `case01_distress_call_911.wav` or `sample_robbery_witness.wav`
+     - Sample Image: `real_street_traffic_surveillance.jpg` or `sample_crime_scene.jpg`
 4. **Resolution:** 1080p (1920x1080) at 30 or 60 FPS screen capture with OBS Studio, Loom, or Windows Game Bar (`Win + Alt + R`).
 5. **Tone:** Confident, professional, technical yet easy to follow, paced at ~130 words per minute.
 

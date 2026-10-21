@@ -1,9 +1,22 @@
 # CrimeVision AI – Intelligent Multimodal Forensic Analysis Platform
 
+> **Automated Forensic Decision Support System with Real-Time Video, Audio, and 3D Crime Scene Reconstruction**
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel%20Frontend-brightgreen?style=for-the-badge&logo=vercel)](https://crime-vision-ai-frontend.vercel.app/)
+[![Backend API](https://img.shields.io/badge/Backend%20API-Render%20Cloud-informational?style=for-the-badge&logo=render)](https://crime-vision-ai-backend.onrender.com)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/Rahul-DS633/Crime-Vision-AI)
+
+## 🌐 Live Cloud Deployment
+- **Frontend Web Dashboard (Vercel)**: [https://crime-vision-ai-frontend.vercel.app/](https://crime-vision-ai-frontend.vercel.app/)
+- **Backend API Gateway (Render)**: [https://crime-vision-ai-backend.onrender.com](https://crime-vision-ai-backend.onrender.com)
+- **Preloaded External Dataset Library**: 14 real-life surveillance cases (7 CCTV videos, 5 acoustic recordings, 2 high-res crime images) accessible with 1 click directly in the dashboard or via the [`samples_dataset/`](samples_dataset) folder.
+
+---
+
 **CrimeVision AI** is an advanced forensic intelligence platform designed to automate crime scene reconstruction and digital evidence analysis using multimodal artificial intelligence. By integrating **image, video, and audio evidence**, the system identifies people, weapons, and objects, analyzes tactical actions, transcribes multilingual witness statements, and generates unified chronological forensic timelines with 3D spatial scene reconstruction.
 
 ---
-.
+
 ## 🏛️ System Architecture
 
 ```mermaid
@@ -87,7 +100,7 @@ python -m unittest backend/tests/test_validation.py
 ```
 
 ### 5. Launch Application
-Start the Flask forensic server:
+Start the Flask forensic server locally:
 ```bash
 # Navigate to the development directory
 cd "5. Project Development Phase"
@@ -97,6 +110,9 @@ Open your browser and navigate to:
 ```
 http://localhost:5000
 ```
+Or access the live cloud-deployed instance immediately without local installation:
+- **Cloud Dashboard**: [https://crime-vision-ai-frontend.vercel.app/](https://crime-vision-ai-frontend.vercel.app/)
+- **Cloud Backend API**: [https://crime-vision-ai-backend.onrender.com](https://crime-vision-ai-backend.onrender.com)
 
 ---
 
