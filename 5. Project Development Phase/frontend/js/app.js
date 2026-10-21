@@ -325,12 +325,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     audioPlayer.onerror = () => {
       console.warn("Audio playback error, falling back to reliable wav audio source.");
-      audioPlayer.src = '/data/uploads/audio/sample_robbery_witness.wav';
+      audioPlayer.src = 'samples/audio/case01_distress_call_911.wav';
       audioPlayer.load();
     };
 
     // Preload initial sample audio
-    audioPlayer.src = '/data/uploads/audio/case01_distress_call_911.wav';
+    audioPlayer.src = 'samples/audio/case01_distress_call_911.wav';
     audioPlayer.load();
   }
 
@@ -383,23 +383,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       if (currentMode === 'image') {
-        const payload = isPreset ? (presetPath || 'backend/data/uploads/image/real_street_traffic_surveillance.jpg') : file;
+        const payload = (file && file instanceof File) ? file : (presetPath || 'samples/image/real_street_traffic_surveillance.jpg');
         const result = await API.analyzeImage(payload);
-        updateImageFindings(result, file, isPreset ? payload : null);
+        updateImageFindings(result, file, typeof payload === 'string' ? payload : null);
       } else if (currentMode === 'audio') {
         if (audioProcessingBanner) audioProcessingBanner.classList.remove('hidden');
         const transcriptElem = document.getElementById('audioTranscriptText');
         if (transcriptElem) {
           transcriptElem.innerHTML = '<span style="color:#60a5fa;"><i class="fa-solid fa-spinner fa-spin"></i> Transcribing speech with Whisper AI engine (extracting acoustic timeline)...</span>';
         }
-        const payload = isPreset ? (presetPath || 'backend/data/uploads/audio/case01_distress_call_911.wav') : file;
+        const payload = (file && file instanceof File) ? file : (presetPath || 'samples/audio/case01_distress_call_911.wav');
         const result = await API.analyzeAudio(payload);
         if (audioProcessingBanner) audioProcessingBanner.classList.add('hidden');
-        updateAudioFindings(result, file, isPreset ? payload : null);
+        updateAudioFindings(result, file, typeof payload === 'string' ? payload : null);
       } else if (currentMode === 'video') {
-        const payload = isPreset ? (presetPath || 'backend/data/uploads/video/real_cctv_surveillance_store.mp4') : file;
+        const payload = (file && file instanceof File) ? file : (presetPath || 'samples/video/real_cctv_surveillance_store.mp4');
         const result = await API.analyzeVideo(payload);
-        updateVideoFindings(result, file, isPreset ? payload : null);
+        updateVideoFindings(result, file, typeof payload === 'string' ? payload : null);
       }
     } catch (err) {
       console.error("Analysis failed:", err);
@@ -479,12 +479,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (file && file instanceof File) {
       previewImg.src = URL.createObjectURL(file);
-    } else if (presetPath) {
-      const norm = presetPath.replace(/\\/g, '/');
-      const parts = norm.split('/data/');
-      previewImg.src = parts.length > 1 ? `/data/${parts[1]}` : (presetPath.startsWith('/') ? presetPath : `/${presetPath}`);
     } else {
-      previewImg.src = '/data/uploads/image/real_street_traffic_surveillance.jpg';
+      const iName = (presetPath || 'real_street_traffic_surveillance.jpg').split(/[/\\]/).pop();
+      previewImg.src = `samples/image/${iName}`;
     }
 
     (detections || []).forEach(det => {
@@ -522,19 +519,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (file && file instanceof File) {
         resolvedSrc = URL.createObjectURL(file);
         if (audioTrackName) audioTrackName.innerHTML = `<i class="fa-solid fa-tape"></i> ${file.name}`;
-      } else if (presetPath) {
-        const norm = presetPath.replace(/\\/g, '/');
-        const parts = norm.split('/data/');
-        resolvedSrc = parts.length > 1 ? `/data/${parts[1]}` : (presetPath.startsWith('/') ? presetPath : `/${presetPath}`);
-        if (audioTrackName) audioTrackName.innerHTML = `<i class="fa-solid fa-tape"></i> ${presetPath.split('/').pop()}`;
-      } else if (result.audio_path) {
-        const norm = result.audio_path.replace(/\\/g, '/');
-        const parts = norm.split('/data/');
-        resolvedSrc = parts.length > 1 ? `/data/${parts[1]}` : '/data/uploads/audio/case01_distress_call_911.wav';
-        if (audioTrackName) audioTrackName.innerHTML = `<i class="fa-solid fa-tape"></i> ${norm.split('/').pop()}`;
       } else {
-        resolvedSrc = '/data/uploads/audio/case01_distress_call_911.wav';
-        if (audioTrackName) audioTrackName.innerHTML = `<i class="fa-solid fa-tape"></i> 911 Emergency Dispatch Audio`;
+        const aName = (presetPath || result.audio_path || 'case01_distress_call_911.wav').split(/[/\\]/).pop();
+        resolvedSrc = `samples/audio/${aName}`;
+        if (audioTrackName) audioTrackName.innerHTML = `<i class="fa-solid fa-tape"></i> ${aName}`;
       }
 
       audioPlayer.src = resolvedSrc;
@@ -594,16 +582,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoPlayer = document.getElementById('surveillanceVideoPlayer');
     if (file && file instanceof File) {
       videoPlayer.src = URL.createObjectURL(file);
-    } else if (presetPath) {
-      const norm = presetPath.replace(/\\/g, '/');
-      const parts = norm.split('/data/');
-      videoPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : (presetPath.startsWith('/') ? presetPath : `/${presetPath}`);
-    } else if (result.video_path) {
-      const norm = result.video_path.replace(/\\/g, '/');
-      const parts = norm.split('/data/');
-      videoPlayer.src = parts.length > 1 ? `/data/${parts[1]}` : '/data/uploads/video/real_cctv_surveillance_store.mp4';
     } else {
-      videoPlayer.src = '/data/uploads/video/real_cctv_surveillance_store.mp4';
+      const vName = (presetPath || result.video_path || 'real_cctv_surveillance_store.mp4').split(/[/\\]/).pop();
+      videoPlayer.src = `samples/video/${vName}`;
     }
     videoPlayer.load();
 
@@ -714,6 +695,193 @@ document.addEventListener('DOMContentLoaded', () => {
     telugu: "మేపుల్ అవెన్యూలో సుమారు 8 గంటల సమయంలో నేను నడుస్తుండగా, మూలలో ఉన్న ఆభరణాల దుకాణంలో ఇంకా లైట్లు వెలిగే ఉన్నాయని నేను గమనించాను. హఠాత్తుగా, బ్యాగులతో దుకాణం నుండి రెండు ముఖం మూసుకున్న వ్యక్తులు వెళ్లిపోతున్నారని నేను చూశాను. వారిలో ఒకరు నడివీధిలో ఒక మాలను పడవేశారు. వారు ప్రక్కనే ఉన్న చీకటి కారులోకి దూకి ఎవరూ ప్రతిస్పందించకముందే వెళ్లిపోయారు. వారు వెళ్లిపోయిన వెంటనే దుకాణం అలారం మ్రోగుతున్నట్లు నేను గుర్తుచేసుకున్నాను.",
     french: "J'ai marché le long de l'avenue Maple vers 20 heures lorsque j'ai remarqué que les lumières étaient toujours allumées à l'intérieur du magasin de bijoux au coin de la rue. Soudain, j'ai vu deux individus masqués sortir précipitamment du magasin en portant des sacs. L'un d'eux a laissé tomber un collier sur le trottoir. Ils ont sauté dans une voiture sombre garée à proximité et ont démarré avant que quiconque puisse réagir. Je me souviens d'avoir entendu la sirène du magasin retentir immédiatement après leur départ."
   };
+
+  // 8. Sample Dataset Library Modal Controller
+  const SAMPLE_DATASET = {
+    video: [
+      {
+        name: "Real CCTV Surveillance Store (65s)",
+        file: "real_cctv_surveillance_store.mp4",
+        category: "Retail / Shoplifting",
+        duration: "65s",
+        desc: "High-resolution retail store CCTV showing suspect concealing merchandise from display shelving into bag."
+      },
+      {
+        name: "Real Intersection Traffic CCTV (54s)",
+        file: "real_intersection_surveillance.mp4",
+        category: "Traffic / Vehicular",
+        duration: "54s",
+        desc: "Overhead city intersection camera tracking multiple vehicles, pedestrians, and transit patterns."
+      },
+      {
+        name: "Armed Robbery CCTV Encounter",
+        file: "armed_robbery_cctv.mp4",
+        category: "Armed Robbery",
+        duration: "28s",
+        desc: "Commercial counter surveillance capturing armed suspect brandishing weapon and confronting store clerk."
+      },
+      {
+        name: "Retail Store Shoplifting CCTV",
+        file: "shoplifting_store_cctv.mp4",
+        category: "Commercial Theft",
+        duration: "42s",
+        desc: "Aisle monitoring recording suspicious loitering and unauthorized item concealment."
+      },
+      {
+        name: "Case 01: Bank ATM Assault",
+        file: "case01_bank_atm_assault.mp4",
+        category: "Violent Crime",
+        duration: "18s",
+        desc: "Exterior bank ATM vestibule showing knife-point ambush of customer withdrawing cash."
+      },
+      {
+        name: "Case 02: Parking Lot Carjacking",
+        file: "case02_parking_lot_carjack.mp4",
+        category: "Vehicle Theft",
+        duration: "22s",
+        desc: "Parking facility camera showing vehicle intercept, forced driver ejection, and getaway."
+      },
+      {
+        name: "Standard Store Surveillance Benchmark",
+        file: "sample_surveillance_store.mp4",
+        category: "Baseline Benchmark",
+        duration: "15s",
+        desc: "Standard benchmark test footage for calibration and validation of computer vision models."
+      }
+    ],
+    audio: [
+      {
+        name: "Case 01: 911 Emergency Distress Call",
+        file: "case01_distress_call_911.wav",
+        category: "Emergency 911",
+        duration: "12s",
+        desc: "Urgent emergency dispatcher audio recording victim reporting an active violent crime in progress."
+      },
+      {
+        name: "Case 02: Gunfire & Sirens Acoustic Feed",
+        file: "case02_gunfire_and_sirens.wav",
+        category: "Acoustic Threat",
+        duration: "14s",
+        desc: "Multi-event acoustic recording containing firearm discharges followed by approaching sirens."
+      },
+      {
+        name: "Case 03: Commercial Break-In Alarm",
+        file: "case03_break_in_alarm.wav",
+        category: "Intrusion Alarm",
+        duration: "10s",
+        desc: "High-decibel facility intrusion alarm sounding following perimeter breach."
+      },
+      {
+        name: "Robbery Witness Testimony (WAV)",
+        file: "sample_robbery_witness.wav",
+        category: "Witness Statement",
+        duration: "25s",
+        desc: "Detailed eyewitness verbal account describing masked suspects fleeing jewelry store robbery."
+      },
+      {
+        name: "Robbery Witness Testimony (MP3)",
+        file: "sample_robbery_witness.mp3",
+        category: "Witness Statement",
+        duration: "25s",
+        desc: "Compressed audio testimony recording for bandwidth-constrained field verification."
+      }
+    ],
+    image: [
+      {
+        name: "Real Street Traffic Surveillance Scene",
+        file: "real_street_traffic_surveillance.jpg",
+        category: "Street Scene",
+        duration: "1920x1080",
+        desc: "Urban street scene with pedestrians, parked vehicles, storefronts, and perimeter evidence."
+      },
+      {
+        name: "Standard Crime Scene Benchmark",
+        file: "sample_crime_scene.jpg",
+        category: "Indoor Scene",
+        duration: "1280x720",
+        desc: "Standard indoor crime scene evidence photo with critical object indicators for 3D room projection."
+      }
+    ]
+  };
+
+  const datasetModal = document.getElementById('datasetModal');
+  const openDatasetModalBtn = document.getElementById('openDatasetModalBtn');
+  const closeDatasetModalBtn = document.getElementById('closeDatasetModalBtn');
+  const datasetListContainer = document.getElementById('datasetListContainer');
+  const datasetTabs = document.querySelectorAll('.dataset-tab');
+
+  function renderDatasetList(category) {
+    if (!datasetListContainer) return;
+    datasetListContainer.innerHTML = '';
+
+    const items = SAMPLE_DATASET[category] || [];
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'dataset-item-card';
+
+      let iconClass = 'fa-solid fa-video';
+      if (category === 'audio') iconClass = 'fa-solid fa-microphone-lines';
+      if (category === 'image') iconClass = 'fa-solid fa-image';
+
+      card.innerHTML = `
+        <div class="dataset-item-header">
+          <span class="dataset-item-badge"><i class="${iconClass}"></i> ${item.category}</span>
+          <span class="dataset-item-duration">${item.duration}</span>
+        </div>
+        <div class="dataset-item-name">${item.name}</div>
+        <div class="dataset-item-desc">${item.desc}</div>
+        <button class="dataset-item-btn">
+          <i class="fa-solid fa-bolt"></i> Load &amp; Process Evidence
+        </button>
+      `;
+
+      card.querySelector('.dataset-item-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectDatasetItem(category, item);
+      });
+
+      card.addEventListener('click', () => {
+        selectDatasetItem(category, item);
+      });
+
+      datasetListContainer.appendChild(card);
+    });
+  }
+
+  function selectDatasetItem(category, item) {
+    if (datasetModal) datasetModal.classList.add('hidden');
+    switchMode(category);
+    const assetPath = `samples/${category}/${item.file}`;
+    uploadPanel.loadPresetDirect(item.name, assetPath, category);
+    startProcessing(null, true, assetPath);
+  }
+
+  openDatasetModalBtn?.addEventListener('click', () => {
+    if (datasetModal) {
+      datasetModal.classList.remove('hidden');
+      renderDatasetList(currentMode || 'video');
+      datasetTabs.forEach(t => {
+        if (t.dataset.tab === (currentMode || 'video')) t.classList.add('active');
+        else t.classList.remove('active');
+      });
+    }
+  });
+
+  closeDatasetModalBtn?.addEventListener('click', () => {
+    datasetModal?.classList.add('hidden');
+  });
+
+  datasetModal?.addEventListener('click', (e) => {
+    if (e.target === datasetModal) datasetModal.classList.add('hidden');
+  });
+
+  datasetTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      datasetTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderDatasetList(tab.dataset.tab);
+    });
+  });
 
   // Pre-load default image preview
   render2DAnnotations([

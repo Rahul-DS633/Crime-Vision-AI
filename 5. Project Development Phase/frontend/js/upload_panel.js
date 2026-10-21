@@ -118,7 +118,7 @@ class UploadPanel {
         if (this.onModeSwitch) this.onModeSwitch('video');
         this.loadPresetDirect(
           'real_cctv_surveillance_store.mp4 (Real Mall CCTV 65s)',
-          'backend/data/uploads/video/real_cctv_surveillance_store.mp4',
+          'samples/video/real_cctv_surveillance_store.mp4',
           'video'
         );
       });
@@ -130,7 +130,7 @@ class UploadPanel {
         if (this.onModeSwitch) this.onModeSwitch('video');
         this.loadPresetDirect(
           'real_intersection_surveillance.mp4 (Traffic CCTV 54s)',
-          'backend/data/uploads/video/real_intersection_surveillance.mp4',
+          'samples/video/real_intersection_surveillance.mp4',
           'video'
         );
       });
@@ -142,7 +142,7 @@ class UploadPanel {
         if (this.onModeSwitch) this.onModeSwitch('image');
         this.loadPresetDirect(
           'real_street_traffic_surveillance.jpg (Street Traffic Crime Scene)',
-          'backend/data/uploads/image/real_street_traffic_surveillance.jpg',
+          'samples/image/real_street_traffic_surveillance.jpg',
           'image'
         );
       });
@@ -154,7 +154,7 @@ class UploadPanel {
         if (this.onModeSwitch) this.onModeSwitch('audio');
         this.loadPresetDirect(
           'case01_distress_call_911.wav (Real 911 Emergency Audio)',
-          'backend/data/uploads/audio/case01_distress_call_911.wav',
+          'samples/audio/case01_distress_call_911.wav',
           'audio'
         );
       });
@@ -210,14 +210,14 @@ class UploadPanel {
     this.isPreset = true;
     this.selectedFile = null;
 
-    let presetName = 'sample_crime_scene.jpg (Preloaded Office)';
-    let path = 'backend/data/uploads/image/sample_crime_scene.jpg';
+    let presetName = 'real_street_traffic_surveillance.jpg (Street Traffic Crime Scene)';
+    let path = 'samples/image/real_street_traffic_surveillance.jpg';
     if (this.currentMode === 'audio') {
-      presetName = 'sample_robbery_witness.wav (Maple Ave Testimony)';
-      path = 'backend/data/uploads/audio/sample_robbery_witness.mp3';
+      presetName = 'case01_distress_call_911.wav (Real 911 Emergency Audio)';
+      path = 'samples/audio/case01_distress_call_911.wav';
     } else if (this.currentMode === 'video') {
       presetName = 'real_cctv_surveillance_store.mp4 (Real Mall CCTV 65s)';
-      path = 'backend/data/uploads/video/real_cctv_surveillance_store.mp4';
+      path = 'samples/video/real_cctv_surveillance_store.mp4';
     }
 
     this.loadPresetDirect(presetName, path, this.currentMode);

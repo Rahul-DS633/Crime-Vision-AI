@@ -130,6 +130,12 @@
           <i class="fa-solid fa-folder-open"></i>
           <span>Standard Case Benchmarks</span>
         </button>
+
+        <!-- Sample Dataset Browser Button -->
+        <button class="btn-preset" id="openDatasetModalBtn" style="margin-top: 6px; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.4); color: #60a5fa;">
+          <i class="fa-solid fa-folder-tree"></i>
+          <span>Sample Dataset Library (14 Cases)</span>
+        </button>
       </div>
 
       <!-- Evidence Quick Stats / Case Info -->
@@ -662,6 +668,27 @@
 
     </section>
   </main>
+
+  <!-- External Sample Dataset Library Modal -->
+  <div class="dataset-modal-backdrop hidden" id="datasetModal">
+    <div class="dataset-modal-card">
+      <div class="dataset-modal-header">
+        <div class="dataset-modal-title">
+          <i class="fa-solid fa-folder-tree text-primary"></i>
+          <span>External Sample Dataset Library (Direct Evidence Select)</span>
+        </div>
+        <button class="dataset-modal-close" id="closeDatasetModalBtn">&times;</button>
+      </div>
+      <div class="dataset-modal-tabs">
+        <button class="dataset-tab active" data-tab="video"><i class="fa-solid fa-video"></i> Video CCTV (7)</button>
+        <button class="dataset-tab" data-tab="audio"><i class="fa-solid fa-microphone-lines"></i> 911 Audio (5)</button>
+        <button class="dataset-tab" data-tab="image"><i class="fa-solid fa-image"></i> Crime Images (2)</button>
+      </div>
+      <div class="dataset-modal-list" id="datasetListContainer">
+        <!-- Injected dynamically by JS -->
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script src="js/api.js"></script>

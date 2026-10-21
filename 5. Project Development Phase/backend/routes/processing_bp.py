@@ -31,10 +31,22 @@ def process_image():
             save_path = os.path.join(IMAGE_UPLOAD_DIR, unique_name)
             file.save(save_path)
         elif request.is_json and 'image_path' in request.json:
-            save_path = request.json['image_path']
+            target = request.json['image_path']
+            if os.path.exists(target):
+                save_path = target
+            else:
+                alt = os.path.join(IMAGE_UPLOAD_DIR, os.path.basename(target))
+                if os.path.exists(alt):
+                    save_path = alt
+                else:
+                    save_path = os.path.join(IMAGE_UPLOAD_DIR, "real_street_traffic_surveillance.jpg")
+                    if not os.path.exists(save_path):
+                        save_path = os.path.join(IMAGE_UPLOAD_DIR, "sample_crime_scene.jpg")
         else:
             # Fallback to sample crime scene
-            save_path = os.path.join(IMAGE_UPLOAD_DIR, "sample_crime_scene.jpg")
+            save_path = os.path.join(IMAGE_UPLOAD_DIR, "real_street_traffic_surveillance.jpg")
+            if not os.path.exists(save_path):
+                save_path = os.path.join(IMAGE_UPLOAD_DIR, "sample_crime_scene.jpg")
 
         result = vision_service.analyze_image(save_path)
         session_id = session_store.create_session(result)

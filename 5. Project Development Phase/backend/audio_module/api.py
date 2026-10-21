@@ -30,10 +30,20 @@ def analyze_audio():
             save_path = os.path.join(AUDIO_UPLOAD_DIR, unique_name)
             file.save(save_path)
         elif request.is_json and 'audio_path' in request.json:
-            save_path = request.json['audio_path']
+            target = request.json['audio_path']
+            if os.path.exists(target):
+                save_path = target
+            else:
+                alt = os.path.join(AUDIO_UPLOAD_DIR, os.path.basename(target))
+                if os.path.exists(alt):
+                    save_path = alt
+                else:
+                    save_path = os.path.join(AUDIO_UPLOAD_DIR, "case01_distress_call_911.wav")
         else:
             # Use sample audio if none uploaded directly
-            sample_path = os.path.join(AUDIO_UPLOAD_DIR, "sample_robbery_witness.wav")
+            sample_path = os.path.join(AUDIO_UPLOAD_DIR, "case01_distress_call_911.wav")
+            if not os.path.exists(sample_path):
+                sample_path = os.path.join(AUDIO_UPLOAD_DIR, "sample_robbery_witness.wav")
             save_path = sample_path
 
         result = audio_service.process_audio(save_path)

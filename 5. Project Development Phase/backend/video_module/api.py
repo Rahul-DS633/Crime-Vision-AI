@@ -34,7 +34,6 @@ def _resolve_video_target() -> str:
             alt = os.path.join(VIDEO_UPLOAD_DIR, os.path.basename(target))
             if os.path.exists(alt):
                 return alt
-            return target
 
     # Default fallback
     sample_path = os.path.join(VIDEO_UPLOAD_DIR, "real_cctv_surveillance_store.mp4")
