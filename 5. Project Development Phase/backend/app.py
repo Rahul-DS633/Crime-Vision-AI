@@ -78,9 +78,11 @@ def serve_static(path):
 
 if __name__ == '__main__':
     preload_models()
-    app_logger.info(f"Starting CrimeVision AI Forensic Platform on port {API_CONFIG['port']}...")
+    port = int(os.environ.get("PORT", API_CONFIG.get("port", 5000)))
+    app_logger.info(f"Starting CrimeVision AI Forensic Platform on 0.0.0.0:{port} (production ready)...")
     app.run(
-        host=API_CONFIG.get("host", "0.0.0.0"),
-        port=API_CONFIG.get("port", 5000),
-        debug=API_CONFIG.get("debug", True)
+        host="0.0.0.0",
+        port=port,
+        debug=False,
+        threaded=True
     )
