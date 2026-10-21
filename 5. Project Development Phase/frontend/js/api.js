@@ -98,6 +98,7 @@ class API {
       method: 'POST',
       body: formData
     });
+    return await response.json();
   }
 
   /**

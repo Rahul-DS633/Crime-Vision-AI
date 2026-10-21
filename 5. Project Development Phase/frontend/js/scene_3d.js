@@ -329,6 +329,15 @@ class VideoTrajectory3D {
     this.isTrackingSuspect = false;
     this.currentSecond = 0;
 
+    // Smooth camera transitions
+    this.isTransitioning = false;
+    this.targetCameraPos = null;
+    this.targetCameraTarget = null;
+    this.startCameraPos = null;
+    this.startCameraTarget = null;
+    this.transitionStartTime = 0;
+    this.transitionDuration = 600;
+
     if (this.container && typeof THREE !== 'undefined') {
       this.init();
     }
@@ -364,6 +373,12 @@ class VideoTrajectory3D {
       this.controls.minDistance = 2;
       this.controls.maxDistance = 35;
       this.controls.target.set(0, 0.5, 0);
+      this.controls.addEventListener('start', () => {
+        this.isTransitioning = false;
+        this.isTrackingSuspect = false;
+        const btnCamFollow = document.getElementById('btnCamFollow');
+        if (btnCamFollow) btnCamFollow.classList.remove('active');
+      });
     }
 
     // 5. Lighting
@@ -691,52 +706,49 @@ class VideoTrajectory3D {
     if (speedElem) speedElem.textContent = `${(wp1.speed || 1.1).toFixed(2)} m/s`;
     if (distElem) distElem.textContent = `${(Math.sqrt(curX * curX + curZ * curZ) + 1.2).toFixed(1)} m`;
 
-    // Follow suspect camera mode
+    // Follow suspect camera mode with smooth lerp
     if (this.isTrackingSuspect && this.controls) {
-      this.controls.target.set(curX, 0.8, curZ);
-      this.camera.position.set(curX, 4.5, curZ + 5.5);
+      this.isTransitioning = false;
+      this.controls.target.lerp(new THREE.Vector3(curX, 0.8, curZ), 0.08);
+      this.camera.position.lerp(new THREE.Vector3(curX, 4.5, curZ + 5.5), 0.06);
     }
+  }
+
+  smoothTransitionTo(targetPos, targetLookAt, duration = 650) {
+    if (!this.camera || !this.controls) return;
+    this.targetCameraPos = targetPos.clone();
+    this.targetCameraTarget = targetLookAt.clone();
+    this.startCameraPos = this.camera.position.clone();
+    this.startCameraTarget = this.controls.target.clone();
+    this.transitionStartTime = performance.now();
+    this.transitionDuration = duration;
+    this.isTransitioning = true;
   }
 
   setCCTVAngle() {
     this.isTrackingSuspect = false;
-    if (this.camera && this.controls) {
-      this.camera.position.set(0, 5.2, 7.5);
-      this.controls.target.set(0, 0.4, 0);
-      this.controls.update();
-    }
+    this.smoothTransitionTo(new THREE.Vector3(0, 5.2, 7.5), new THREE.Vector3(0, 0.4, 0));
   }
 
   setTopDownView() {
     this.isTrackingSuspect = false;
-    if (this.camera && this.controls) {
-      this.camera.position.set(0, 15, 0.01);
-      this.controls.target.set(0, 0, 0);
-      this.controls.update();
-    }
+    this.smoothTransitionTo(new THREE.Vector3(0, 15, 0.01), new THREE.Vector3(0, 0, 0));
   }
 
   setOrbitView() {
     this.isTrackingSuspect = false;
-    if (this.camera && this.controls) {
-      this.camera.position.set(7.5, 7.0, 8.5);
-      this.controls.target.set(0, 0.5, 0);
-      this.controls.update();
-    }
+    this.smoothTransitionTo(new THREE.Vector3(7.5, 7.0, 8.5), new THREE.Vector3(0, 0.5, 0));
   }
 
   toggleTrackSuspect() {
     this.isTrackingSuspect = !this.isTrackingSuspect;
+    this.isTransitioning = false;
     return this.isTrackingSuspect;
   }
 
   resetCamera() {
     this.isTrackingSuspect = false;
-    if (this.camera && this.controls) {
-      this.camera.position.set(0, 7.5, 9.5);
-      this.controls.target.set(0, 0.5, 0);
-      this.controls.update();
-    }
+    this.smoothTransitionTo(new THREE.Vector3(0, 7.5, 9.5), new THREE.Vector3(0, 0.5, 0));
   }
 
   onResize() {
@@ -752,6 +764,24 @@ class VideoTrajectory3D {
   animate() {
     this.animationId = requestAnimationFrame(() => this.animate());
     
+    // Smooth camera transition interpolation
+    if (this.isTransitioning && this.camera && this.controls) {
+      const now = performance.now();
+      const progress = Math.min((now - this.transitionStartTime) / this.transitionDuration, 1.0);
+      // easeInOutCubic
+      const ease = progress < 0.5 
+        ? 4 * progress * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      this.camera.position.lerpVectors(this.startCameraPos, this.targetCameraPos, ease);
+      this.controls.target.lerpVectors(this.startCameraTarget, this.targetCameraTarget, ease);
+      this.controls.update();
+
+      if (progress >= 1.0) {
+        this.isTransitioning = false;
+      }
+    }
+
     // Pulse REC LED
     if (this.recLed) {
       this.recLed.material.color.setHex(Date.now() % 1000 > 500 ? 0xef4444 : 0x450a0a);
