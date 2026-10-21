@@ -198,8 +198,8 @@
             <div class="insight-block">
               <div class="block-label"><i class="fa-solid fa-wand-magic-sparkles text-primary"></i> AI SCENE SUMMARY</div>
               <div class="ai-summary-content" id="aiSceneSummaryBox">
-                <p class="summary-line"><strong>Summary Type:</strong> <span id="imageSummaryType">Crime Scene</span></p>
-                <p class="summary-line"><strong>Brief Description:</strong> <span id="imageBriefDesc">A male individual is observed lying on the floor, surrounded by a knife and restrained with tape.</span></p>
+                <p class="summary-line"><strong>Summary Type:</strong> <span id="imageSummaryType">Awaiting Analysis</span></p>
+                <p class="summary-line"><strong>Brief Description:</strong> <span id="imageBriefDesc">Upload or select an image to generate real-time AI scene analysis.</span></p>
               </div>
             </div>
 
@@ -207,7 +207,7 @@
             <div class="insight-block">
               <div class="block-label"><i class="fa-solid fa-eye text-primary"></i> VISUAL SUMMARY</div>
               <p class="insight-text" id="imageVisualSummary">
-                A man laying on the floor with a knife and tape around him
+                No image analyzed yet. Click "Start Processing" to begin.
               </p>
             </div>
 
@@ -215,22 +215,22 @@
             <div class="metrics-grid">
               <div class="metric-box">
                 <i class="fa-solid fa-shapes metric-icon"></i>
-                <div class="metric-val" id="imgObjectsCount">9</div>
+                <div class="metric-val" id="imgObjectsCount">0</div>
                 <div class="metric-title">Objects</div>
               </div>
               <div class="metric-box">
                 <i class="fa-solid fa-user-group metric-icon"></i>
-                <div class="metric-val" id="imgPersonsCount">1</div>
+                <div class="metric-val" id="imgPersonsCount">0</div>
                 <div class="metric-title">Persons</div>
               </div>
               <div class="metric-box">
                 <i class="fa-solid fa-crosshairs metric-icon text-danger"></i>
-                <div class="metric-val text-danger" id="imgWeaponsCount">1</div>
+                <div class="metric-val text-danger" id="imgWeaponsCount">0</div>
                 <div class="metric-title">Weapons</div>
               </div>
               <div class="metric-box">
                 <i class="fa-solid fa-location-dot metric-icon text-success"></i>
-                <div class="metric-val" id="imgLocationName">office</div>
+                <div class="metric-val" id="imgLocationName">Awaiting</div>
                 <div class="metric-title">Location</div>
               </div>
             </div>
@@ -239,7 +239,7 @@
             <div class="insight-block">
               <div class="block-label"><i class="fa-solid fa-bolt text-warning"></i> ACTIONS DETECTED</div>
               <div class="pill-tags" id="imageActionsTags">
-                <span class="tag-pill">lying down</span>
+                <span class="tag-pill">awaiting input</span>
               </div>
             </div>
 
@@ -247,7 +247,7 @@
             <div class="insight-block">
               <div class="block-label"><i class="fa-solid fa-tags text-primary"></i> EVIDENCE FACTS</div>
               <p class="insight-text font-mono" id="imageEvidenceFacts">
-                laptop, diningtable, chair, Human, sofa, cup, knife, tape
+                Awaiting evidence ingestion...
               </p>
             </div>
 
@@ -364,7 +364,7 @@
             </div>
             <div class="transcript-box" id="liveTranscriptBox">
               <p class="transcript-text" id="audioTranscriptText">
-                I was walking down Maple Avenue around 8 p.m. when I noticed the lights still on inside the jewelry store on the corner. Suddenly, I saw two masked individuals rush out of the store carrying bags. One of them dropped a necklace on the sidewalk. They jumped into a dark car parked nearby and sped off before anyone could react. I remember hearing the store alarm blaring right after they drove away.
+                Upload an audio recording or select a preset to generate an automated Whisper forensic transcript.
               </p>
             </div>
           </div>
@@ -377,15 +377,15 @@
                 <span>AI Intelligence Report</span>
               </div>
               <div class="badges-row">
-                <span class="crime-badge danger" id="audioCrimeBadge">ROBBERY</span>
-                <span class="crime-badge success" id="audioLocationBadge">STORE</span>
+                <span class="crime-badge warning" id="audioCrimeBadge">AWAITING</span>
+                <span class="crime-badge success" id="audioLocationBadge">AUDIO</span>
               </div>
             </div>
             
             <div class="intelligence-summary-box">
               <div class="ai-summary-pill"><i class="fa-solid fa-quote-left"></i> AI SUMMARY</div>
               <p class="summary-paragraph" id="audioAiSummary">
-                "The witness reported observing two masked individuals exiting the jewelry store on Maple Avenue around 8 p.m., fleeing the scene in a dark car after dropping a necklace, and speeding away as the store's alarm sounded."
+                "Upload or select an audio file to extract forensic facts, suspect descriptions, and chronological event timelines."
               </p>
             </div>
 
@@ -403,7 +403,7 @@
               </div>
               <div class="translation-content-box">
                 <p id="translationOutputText" class="translation-text">
-                  I was walking down Maple Avenue around 8 p.m. when I noticed the lights still on inside the jewelry store on the corner. Suddenly, I saw two masked individuals rush out of the store carrying bags. One of them dropped a necklace on the sidewalk. They jumped into a dark car parked nearby and sped off before anyone could react. I remember hearing the store alarm blaring right after they drove away.
+                  Upload an audio file to generate multilingual transcripts across English, Hindi, Telugu, and French.
                 </p>
               </div>
             </div>
@@ -430,24 +430,8 @@
                 </thead>
                 <tbody id="audioTimelineBody">
                   <tr>
-                    <td class="time-col">00:00</td>
-                    <td>witness noticed lights on inside jewelry store</td>
-                  </tr>
-                  <tr>
-                    <td class="time-col">00:07</td>
-                    <td>two masked individuals rushed out of store</td>
-                  </tr>
-                  <tr>
-                    <td class="time-col">00:12</td>
-                    <td>suspect dropped necklace on sidewalk</td>
-                  </tr>
-                  <tr>
-                    <td class="time-col">00:15</td>
-                    <td>suspects sped off in car</td>
-                  </tr>
-                  <tr>
-                    <td class="time-col">00:21</td>
-                    <td>store alarm blaring</td>
+                    <td class="time-col">--:--</td>
+                    <td>Awaiting audio analysis...</td>
                   </tr>
                 </tbody>
               </table>
@@ -572,7 +556,7 @@
             <div class="insight-block">
               <div class="block-label"><i class="fa-solid fa-film text-primary"></i> AI Visual Summary</div>
               <p class="insight-text leading-relaxed" id="videoVisualSummaryText">
-                A man and a woman are seen entering and moving within a store located in a shopping mall, as captured by surveillance footage over a period of 11 seconds. The video sequences show the individuals navigating the store, with no explicit depiction of a crime being committed during this time frame.
+                Upload or select surveillance video footage to generate an automated OpenCV forensic visual analysis.
               </p>
             </div>
           </div>
@@ -590,19 +574,19 @@
             <div class="scene-intel-grid">
               <div class="intel-item">
                 <span class="intel-label">Objects Detect</span>
-                <span class="intel-val" id="videoObjectsDetect">refrigerator, handbag, orange, backpack, donut</span>
+                <span class="intel-val" id="videoObjectsDetect">Awaiting video input</span>
               </div>
               <div class="intel-item">
                 <span class="intel-label">People Count</span>
-                <span class="intel-val" id="videoPeopleCount">2</span>
+                <span class="intel-val" id="videoPeopleCount">0</span>
               </div>
               <div class="intel-item">
                 <span class="intel-label">Vehicles Count</span>
-                <span class="intel-val" id="videoVehiclesCount">1</span>
+                <span class="intel-val" id="videoVehiclesCount">0</span>
               </div>
               <div class="intel-item">
                 <span class="intel-label">Location</span>
-                <span class="intel-val" id="videoLocation">Shopping mall store</span>
+                <span class="intel-val" id="videoLocation">Awaiting</span>
               </div>
               <div class="intel-item">
                 <span class="intel-label">Action</span>
@@ -628,57 +612,9 @@
                   </tr>
                 </thead>
                 <tbody id="videoTimelineBody">
-                  <tr data-sec="0">
-                    <td class="time-col">00:00</td>
-                    <td>A man is in a store with multiple refrigerators and handbags.</td>
-                  </tr>
-                  <tr data-sec="1">
-                    <td class="time-col">00:01</td>
-                    <td>A person is in the middle of a store with other people and refrigerators.</td>
-                  </tr>
-                  <tr data-sec="2">
-                    <td class="time-col">00:02</td>
-                    <td>A store in a shopping mall has people and refrigerators.</td>
-                  </tr>
-                  <tr data-sec="3">
-                    <td class="time-col">00:03</td>
-                    <td>A person is seen among multiple people and refrigerators in a store.</td>
-                  </tr>
-                  <tr data-sec="5">
-                    <td class="time-col">00:05</td>
-                    <td>A store has people, handbags, and refrigerators.</td>
-                  </tr>
-                  <tr data-sec="6">
-                    <td class="time-col">00:06</td>
-                    <td>A shopper is in a store with backpacks and refrigerators.</td>
-                  </tr>
-                  <tr data-sec="7">
-                    <td class="time-col">00:07</td>
-                    <td>A store in a shopping area has people, backpacks, and handbags.</td>
-                  </tr>
-                  <tr data-sec="8">
-                    <td class="time-col">00:08</td>
-                    <td>A woman is in a store with multiple handbags and refrigerators.</td>
-                  </tr>
-                  <tr data-sec="10">
-                    <td class="time-col">00:10</td>
-                    <td>A store has people and a plethora of refrigerators.</td>
-                  </tr>
-                  <tr data-sec="11">
-                    <td class="time-col">00:11</td>
-                    <td>A shop in a mall has people and refrigerators.</td>
-                  </tr>
-                  <tr data-sec="12">
-                    <td class="time-col">00:12</td>
-                    <td>People and refrigerators are present.</td>
-                  </tr>
-                  <tr data-sec="13">
-                    <td class="time-col">00:13</td>
-                    <td>People and refrigerators are still visible.</td>
-                  </tr>
-                  <tr data-sec="14">
-                    <td class="time-col">00:14</td>
-                    <td>Multiple people and handbags are seen with refrigerators.</td>
+                  <tr>
+                    <td class="time-col">--:--</td>
+                    <td>Awaiting video processing to extract second-by-second timeline...</td>
                   </tr>
                 </tbody>
               </table>

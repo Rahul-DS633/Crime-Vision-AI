@@ -230,20 +230,13 @@ class VisionService:
         })
         return detections, people_count, weapons_count
 
-    def classify_scene(self, image_path: str) -> str:
+    def classify_scene(self, image_path: str, detections: List[Dict[str, Any]] = None) -> str:
         """
-        Classifies scene location (e.g. office, road, store, bedroom) using CLIP
+        Classifies scene location (e.g. office, road, store, bedroom) using CLIP or object heuristics.
         """
         self.ensure_models_loaded()
-        if not os.path.exists(image_path):
-            sample_path = os.path.join(IMAGE_UPLOAD_DIR, "sample_crime_scene.jpg")
-            if os.path.exists(sample_path):
-                image_path = sample_path
-            else:
-                return "office"
-
         clip_bundle = self.clip
-        if clip_bundle and clip_bundle.get("model") is not None and clip_bundle.get("processor") is not None:
+        if clip_bundle and clip_bundle.get("model") is not None and clip_bundle.get("processor") is not None and os.path.exists(image_path):
             try:
                 image_pil = Image.open(image_path).convert("RGB")
                 processor = clip_bundle["processor"]
@@ -263,23 +256,26 @@ class VisionService:
             except Exception as e:
                 logger.warning(f"CLIP classification failed: {e}")
 
-        # Fallback scene location
-        return "office"
+        # Intelligent heuristic fallback based on detected entities
+        if detections:
+            labels = [d.get("label", "").lower() for d in detections]
+            if any(l in labels for l in ["car", "truck", "bus", "motorcycle", "vehicle", "traffic light"]):
+                return "road"
+            if any(l in labels for l in ["laptop", "mouse", "keyboard", "chair", "desk"]):
+                return "office"
+            if any(l in labels for l in ["refrigerator", "bottle", "shelf"]):
+                return "retail store"
+            if any(l in labels for l in ["bed", "couch", "sofa", "tv"]):
+                return "residential living room"
+        return "road / outdoor sector"
 
-    def generate_caption(self, image_path: str) -> str:
+    def generate_caption(self, image_path: str, detections: List[Dict[str, Any]] = None, location: str = "surveillance zone") -> str:
         """
-        Generates visual scene description using BLIP / BLIP-2
+        Generates visual scene description using BLIP / BLIP-2 or dynamic entity synthesis.
         """
         self.ensure_models_loaded()
-        if not os.path.exists(image_path):
-            sample_path = os.path.join(IMAGE_UPLOAD_DIR, "sample_crime_scene.jpg")
-            if os.path.exists(sample_path):
-                image_path = sample_path
-            else:
-                return "A male individual is observed lying on the floor, surrounded by a knife and restrained with tape."
-
         blip_bundle = self.blip2
-        if blip_bundle and blip_bundle.get("model") is not None and blip_bundle.get("processor") is not None:
+        if blip_bundle and blip_bundle.get("model") is not None and blip_bundle.get("processor") is not None and os.path.exists(image_path):
             try:
                 image_pil = Image.open(image_path).convert("RGB")
                 processor = blip_bundle["processor"]
@@ -289,23 +285,44 @@ class VisionService:
                 inputs = processor(image_pil, return_tensors="pt").to(device)
                 with torch.no_grad():
                     out = model.generate(**inputs, max_new_tokens=60)
-                caption = processor.decode(out[0], skip_special_tokens=True)
-                return caption
+                caption = processor.decode(out[0], skip_special_tokens=True).strip()
+                if caption and len(caption) > 4:
+                    return caption
             except Exception as e:
                 logger.warning(f"BLIP captioning failed: {e}")
 
-        return "A male individual is observed lying on the floor, surrounded by a knife and restrained with tape."
+        # Dynamic fallback from detected entities
+        if detections:
+            labels = list(set(d.get("label", "object") for d in detections))
+            people = sum(1 for d in detections if d.get("label") == "Human")
+            vehicles = sum(1 for d in detections if d.get("label") in ["car", "truck", "bus", "motorcycle", "vehicle"])
+            weapons = sum(1 for d in detections if d.get("label") == "Weapon")
+            desc_parts = []
+            if people > 0:
+                desc_parts.append(f"{people} person(s)")
+            if vehicles > 0:
+                desc_parts.append(f"{vehicles} vehicle(s)")
+            if weapons > 0:
+                desc_parts.append(f"{weapons} weapon(s)")
+            other = [l for l in labels if l not in ["Human", "Weapon", "car", "truck", "bus", "motorcycle", "vehicle"]]
+            if other:
+                desc_parts.append(f"objects ({', '.join(other[:4])})")
+            
+            entities_str = " and ".join(desc_parts) if desc_parts else ", ".join(labels[:4])
+            return f"A surveillance image showing {entities_str} in a {location} setting."
 
-    def refine_caption(self, raw_caption: str) -> Dict[str, str]:
+        return f"A surveillance photograph captured in a {location}."
+
+    def refine_caption(self, raw_caption: str, detections: List[Dict[str, Any]] = None, location: str = "Surveillance Zone") -> Dict[str, str]:
         """
-        Use Groq to refine a raw BLIP caption into a concise 2-line forensic summary:
-        Line 1: Summary Type: [Brief Category: e.g., Surveillance/Theft/Evidence/Crime Scene]
+        Refine a raw caption into a concise 2-line forensic summary:
+        Line 1: Summary Type: [Brief Category]
         Line 2: Brief Description: [Concise description of the scene]
         """
         prompt = f"""Refine the following raw image caption into a professional forensic summary.
 
 STRUCTURE:
-Line 1: Summary Type: [Brief Category: e.g., Surveillance/Theft/Evidence/Crime Scene]
+Line 1: Summary Type: [Brief Category: e.g., Surveillance/Traffic/Pedestrian/Evidence/Crime Scene]
 Line 2: Brief Description: [Concise description of the scene]
 
 Raw Caption: {raw_caption}
@@ -315,7 +332,7 @@ Return ONLY the refined two-line summary."""
         groq_resp = execute_groq_prompt(prompt, temperature=0.1)
         if groq_resp and "Line 1:" in groq_resp:
             lines = [l.strip() for l in groq_resp.split("\n") if l.strip()]
-            summary_type = "Crime Scene"
+            summary_type = "Surveillance Scene"
             brief_desc = raw_caption
             for l in lines:
                 if l.startswith("Line 1:"):
@@ -328,37 +345,64 @@ Return ONLY the refined two-line summary."""
                 "full_text": f"Summary Type: {summary_type}\nBrief Description: {brief_desc}"
             }
 
-        # Deterministic forensic output matching prompt specification
+        # Dynamic, context-grounded forensic fallback (NO hardcoded static victims/knives)
+        dets = detections or []
+        has_weapon = any(d.get("label") == "Weapon" for d in dets)
+        has_vehicle = any(d.get("label") in ["car", "truck", "bus", "motorcycle", "vehicle", "Vehicle"] for d in dets)
+        has_person = any(d.get("label") in ["Human", "person", "Person"] for d in dets)
+
+        if has_weapon:
+            summary_type = "Armed Confrontation / Threat Incident"
+        elif has_vehicle and has_person:
+            summary_type = "Pedestrian & Vehicular Surveillance"
+        elif has_vehicle:
+            summary_type = "Traffic & Vehicular Activity"
+        elif has_person:
+            summary_type = "Pedestrian / Subject Surveillance"
+        else:
+            summary_type = "Property & Environment Monitoring"
+
+        # Format brief description using the actual raw_caption or detected items
+        if raw_caption and len(raw_caption.strip()) > 5:
+            cap = raw_caption.strip()
+            brief_desc = cap[0].upper() + cap[1:]
+            if not brief_desc.endswith("."):
+                brief_desc += "."
+        else:
+            obj_names = list(set(d.get("label", "object") for d in dets))
+            brief_desc = f"Visual assessment in {location} sector identifying {', '.join(obj_names) if obj_names else 'ambient surveillance area'}."
+
         return {
-            "summary_type": "Crime Scene",
-            "brief_description": "A male individual is observed lying on the floor, surrounded by a knife and restrained with tape.",
-            "full_text": "Summary Type: Crime Scene\nBrief Description: A male individual is observed lying on the floor, surrounded by a knife and restrained with tape."
+            "summary_type": summary_type,
+            "brief_description": brief_desc,
+            "full_text": f"Summary Type: {summary_type}\nBrief Description: {brief_desc}"
         }
 
     def detect_actions(self, detections: List[Dict[str, Any]], image_path: str) -> List[str]:
         """
-        Detects forensic actions (e.g. lying down, struggling, running)
+        Detects forensic actions (e.g. standing, traversing, lying down)
         """
-        # Analyze bounding box aspect ratio of Human
         actions = []
         for det in detections:
-            if det["label"] == "Human":
+            if det["label"] in ["Human", "person", "Person"]:
                 w = det["box_2d"][2] - det["box_2d"][0]
                 h = det["box_2d"][3] - det["box_2d"][1]
-                if w > h * 1.1:
-                    actions.append("lying down")
-                else:
+                if w > h * 1.15:
+                    actions.append("lying down / prone")
+                elif h > w * 1.3:
                     actions.append("standing / upright")
+                else:
+                    actions.append("traversing / walking")
         if not actions:
-            actions.append("lying down")
+            actions.append("stationary / surveillance detection")
         return list(set(actions))
 
     def generate_scenarios(self, forensic_facts: Dict[str, Any]) -> List[str]:
         """
-        Generate exactly 3 forensic hypotheses:
+        Generate exactly 3 forensic hypotheses grounded in observed facts:
         1. Primary Scenario (Most likely)
-        2. Alternative Scenario (Defensive)
-        3. Low-Probability Scenario (Outlier)
+        2. Alternative Scenario (Secondary explanation)
+        3. Investigative Scenario (Outlier / Precautionary)
         """
         import json
         prompt = f"""Analyze these visual/auditory facts:
@@ -366,13 +410,12 @@ Return ONLY the refined two-line summary."""
 
 Generate exactly 3 forensic hypotheses:
 1. Primary Scenario (Most likely)
-2. Alternative Scenario (Defensive)
-3. Low-Probability Scenario (Outlier / Staged)
+2. Alternative Scenario (Secondary explanation)
+3. Investigative Scenario (Outlier / Precautionary)
 Format: Professional Bullet points."""
 
         groq_resp = execute_groq_prompt(prompt, temperature=0.1)
         if groq_resp:
-            # Parse hypotheses into list
             hypotheses = []
             current = []
             for line in groq_resp.split("\n"):
@@ -389,21 +432,60 @@ Format: Professional Bullet points."""
             if len(hypotheses) >= 3:
                 return hypotheses[:3]
 
-        # Standard forensic scenarios matching design reference (Page 30)
-        return [
-            "Scenario 1: The man was attacked by an unknown assailant while working late in the office, and the perpetrator used the knife to inflict fatal wounds before fleeing the scene.",
-            "Scenario 2: The individual, feeling overwhelmed by stress, attempted to harm himself with the knife but was unable to complete the act and lies there, awaiting help, with the tape possibly being used in a misguided attempt to treat the wound.",
-            "Scenario 3: The person staged a crime scene to mislead investigators, strategically placing the knife and tape to create the illusion of a violent struggle, but ultimately fell asleep or lost consciousness on the floor."
-        ]
+        # Dynamic, evidence-grounded hypotheses (Never hardcoded to knife/office)
+        location = forensic_facts.get("location", "Surveillance Sector")
+        objects = [str(o).lower() for o in forensic_facts.get("objects", [])]
+        people_count = forensic_facts.get("people_count", 0)
+        weapons_count = forensic_facts.get("weapons_count", 0)
+        actions = forensic_facts.get("actions", ["observed on scene"])
+        has_vehicle = any(v in objects for v in ["car", "vehicle", "truck", "motorcycle", "bus"])
+
+        if weapons_count > 0:
+            return [
+                f"Scenario 1 (Primary): Armed Threat Escalation - Subject identified in possession of weapon in {location}, posing active physical threat.",
+                f"Scenario 2 (Alternative): Defensive Weapon Display - Weapon drawn in reaction to an external confrontation or imminent danger.",
+                f"Scenario 3 (Investigative): Threat Intimidation - Weapon displayed to intimidate occupants without discharge."
+            ]
+        elif has_vehicle and people_count > 0:
+            return [
+                f"Scenario 1 (Primary): Pedestrian Transit Near Vehicle - Subject observed traversing {location} in close proximity to an active or parked vehicle.",
+                f"Scenario 2 (Alternative): Vehicle Ingress / Egress Point - Subject arriving at or departing from the vehicle for transport or delivery.",
+                f"Scenario 3 (Investigative): Perimeter Surveillance - Subject monitoring the vehicular pathway or parked vehicle."
+            ]
+        elif has_vehicle:
+            return [
+                f"Scenario 1 (Primary): Vehicular Transit - Vehicle traversing or parked within monitored {location} zone.",
+                f"Scenario 2 (Alternative): Temporary Vehicle Stoppage - Vehicle idling or waiting for passenger pickup.",
+                f"Scenario 3 (Investigative): Traffic Flow Monitoring - Routine surveillance observation of vehicular transit."
+            ]
+        elif people_count > 1:
+            return [
+                f"Scenario 1 (Primary): Interpersonal Interaction - Multiple individuals engaged in dialogue or activity within {location}.",
+                f"Scenario 2 (Alternative): Group Movement - Subjects moving cohesively through the monitored perimeter.",
+                f"Scenario 3 (Investigative): Disputed Encounter - Subjects in close physical proximity with potential confrontation."
+            ]
+        elif people_count == 1:
+            actions_str = ", ".join(actions)
+            return [
+                f"Scenario 1 (Primary): Solo Subject Activity - Individual ({actions_str}) navigating {location}.",
+                f"Scenario 2 (Alternative): Facility Access / Transit - Person utilizing the monitored sector for authorized transit.",
+                f"Scenario 3 (Investigative): Loitering Observation - Subject remaining stationary within {location} for extended duration."
+            ]
+        else:
+            return [
+                f"Scenario 1 (Primary): Static Environmental Assessment - Evidence items observed situated within {location}.",
+                f"Scenario 2 (Alternative): Post-Incident Residual Field - Objects documented following prior human activity.",
+                f"Scenario 3 (Investigative): Baseline Sector Monitoring - Normal unoccupied state of monitored area."
+            ]
 
     def analyze_image(self, image_path: str) -> Dict[str, Any]:
         """
         Complete end-to-end image analysis pipeline
         """
         detection_res = self.detect_objects(image_path)
-        location = self.classify_scene(image_path)
-        raw_caption = self.generate_caption(image_path)
-        refined_caption = self.refine_caption(raw_caption)
+        location = self.classify_scene(image_path, detection_res["detections"])
+        raw_caption = self.generate_caption(image_path, detection_res["detections"], location)
+        refined_caption = self.refine_caption(raw_caption, detection_res["detections"], location)
         actions = self.detect_actions(detection_res["detections"], image_path)
 
         forensic_context = {

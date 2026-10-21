@@ -51,12 +51,26 @@ class AudioService:
             "location_badge": intelligence.get("location_badge", "STORE")
         }
 
-        # 5. Generate audio scenario hypotheses
-        scenarios = [
-            "Scenario 1: Commercial Burglary / Robbery - Coordinated entry into jewelry retail establishment after normal business hours, seizing display merchandise.",
-            "Scenario 2: Smash and Grab - Opportunistic robbery exploiting late evening visibility, with a getaway driver stationed outside.",
-            "Scenario 3: Internal Collusion - Staged incident intended to trigger insurance recovery, evidenced by prompt alarm activation after vehicle departure."
-        ]
+        # 5. Generate dynamic audio scenario hypotheses
+        crime_t = intelligence.get("crime_type", "RECORDED_STATEMENT")
+        if crime_t == "RECORDED_STATEMENT":
+            scenarios = [
+                "Scenario 1 (Primary): Direct Oral Statement - Identified speaker providing verbal introduction or official recorded statement.",
+                "Scenario 2 (Alternative): Forensic Voiceprint Registration - Audio captured for biometric vocal profiling and speaker verification.",
+                "Scenario 3 (Investigative): Non-Hostile Communication - Standard vocal delivery without duress or background acoustic disturbance."
+            ]
+        elif crime_t in ["ARMED_ROBBERY", "COMMERCIAL_THEFT", "ASSAULT_INCIDENT"]:
+            scenarios = [
+                "Scenario 1 (Primary): Direct Witness Account - Eyewitness observed active incident and reported key suspect and transit details.",
+                "Scenario 2 (Alternative): Post-Incident Reporting - Observer witnessed aftermath or getaway following altercation.",
+                "Scenario 3 (Investigative): Emergency Deposition - Urgent verbal statement documented for investigative dispatch."
+            ]
+        else:
+            scenarios = [
+                "Scenario 1 (Primary): Ambient Surveillance Audio - Audio channel monitoring environmental and acoustic sector.",
+                "Scenario 2 (Alternative): Non-Verbal Acoustic Event - Acoustic frequency analysis without human vocal distress.",
+                "Scenario 3 (Investigative): Acoustic Baseline Calibration - Measurement of background noise and room impulse response."
+            ]
 
         result = {
             "status": "success",

@@ -419,15 +419,15 @@ document.addEventListener('DOMContentLoaded', () => {
     imageChat.setSessionId(activeSessionId);
 
     // Stats
-    document.getElementById('imgObjectsCount').textContent = result.objects_count || (result.detections ? result.detections.length : 8);
-    document.getElementById('imgPersonsCount').textContent = result.people_count || 1;
-    document.getElementById('imgWeaponsCount').textContent = result.weapons_count || 1;
+    document.getElementById('imgObjectsCount').textContent = (result.objects_count !== undefined) ? result.objects_count : (result.detections ? result.detections.length : 0);
+    document.getElementById('imgPersonsCount').textContent = (result.people_count !== undefined) ? result.people_count : 0;
+    document.getElementById('imgWeaponsCount').textContent = (result.weapons_count !== undefined) ? result.weapons_count : 0;
     document.getElementById('imgLocationName').textContent = result.location || 'Surveillance Zone';
 
     // Summaries
     if (result.ai_scene_summary) {
-      document.getElementById('imageSummaryType').textContent = result.ai_scene_summary.summary_type || 'Crime Scene';
-      document.getElementById('imageBriefDesc').textContent = result.ai_scene_summary.brief_description || result.visual_summary;
+      document.getElementById('imageSummaryType').textContent = result.ai_scene_summary.summary_type || 'Surveillance Analysis';
+      document.getElementById('imageBriefDesc').textContent = result.ai_scene_summary.brief_description || result.visual_summary || 'Visual evidence analyzed.';
     }
     if (result.visual_summary) {
       document.getElementById('imageVisualSummary').textContent = result.visual_summary;
@@ -436,7 +436,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Actions tags
     const actionsBox = document.getElementById('imageActionsTags');
     actionsBox.innerHTML = '';
-    (result.actions || ['standing', 'surveillance detection']).forEach(act => {
+    const actList = (result.actions && result.actions.length > 0) ? result.actions : ['surveillance observation'];
+    actList.forEach(act => {
       const span = document.createElement('span');
       span.className = 'tag-pill';
       span.textContent = act;
@@ -444,8 +445,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Evidence Facts
-    const facts = result.evidence_facts || listUniqueLabels(result.detections) || ['Human', 'Vehicle', 'Weapon'];
-    document.getElementById('imageEvidenceFacts').textContent = Array.isArray(facts) ? facts.join(', ') : facts;
+    const facts = result.evidence_facts || listUniqueLabels(result.detections) || [];
+    document.getElementById('imageEvidenceFacts').textContent = Array.isArray(facts) ? (facts.length > 0 ? facts.join(', ') : 'None detected') : (facts || 'None');
 
     // Scenarios
     const scenariosList = document.getElementById('imageScenariosList');
