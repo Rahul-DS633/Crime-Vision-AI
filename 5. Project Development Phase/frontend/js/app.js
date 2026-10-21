@@ -655,15 +655,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Check health on startup
-  API.checkHealth().then(res => {
-    const statusText = document.getElementById('systemHealthText');
-    const engineInfo = document.getElementById('engineInfo');
-    if (res.status === 'healthy') {
-      statusText.textContent = `AI Engine Online (${res.device.toUpperCase()})`;
-      engineInfo.textContent = `PyTorch ${res.device.toUpperCase()} + RT-DETR`;
+  // Backend Connection Controller & Status Indicator
+  const backendConnectBtn = document.getElementById('backendConnectBtn');
+  const backendConnectText = document.getElementById('backendConnectText');
+  const statusText = document.getElementById('systemHealthText');
+  const systemStatusDot = document.getElementById('systemStatusDot');
+  const engineInfo = document.getElementById('engineInfo');
+
+  async function updateSystemHealth() {
+    const curUrl = API.getBackendUrl();
+    if (backendConnectText) {
+      backendConnectText.textContent = curUrl ? 'Backend: Configured' : 'Connect Backend';
+      if (curUrl && backendConnectBtn) backendConnectBtn.classList.add('connected');
+      else if (backendConnectBtn) backendConnectBtn.classList.remove('connected');
+    }
+
+    const res = await API.checkHealth();
+    if (res.status === 'healthy' || res.status === 'online') {
+      const dev = (res.device || 'API').toUpperCase();
+      if (statusText) statusText.textContent = `Backend Online (${dev})`;
+      if (systemStatusDot) systemStatusDot.style.background = 'var(--accent-success)';
+      if (engineInfo) engineInfo.textContent = `PyTorch ${dev} + RT-DETR`;
+      if (backendConnectBtn) {
+        backendConnectBtn.classList.add('connected');
+        if (backendConnectText) backendConnectText.textContent = 'Backend: Online';
+      }
+    } else {
+      if (statusText) statusText.textContent = curUrl ? 'Render Backend (Connecting...)' : 'AI Engine Ready (Demo Mode)';
+      if (systemStatusDot) systemStatusDot.style.background = 'var(--accent-cyan)';
+    }
+  }
+
+  backendConnectBtn?.addEventListener('click', async () => {
+    const current = API.getBackendUrl();
+    const inputUrl = prompt(
+      "Enter your Render Backend URL (e.g. https://crime-vision-ai.onrender.com):",
+      current || ""
+    );
+    if (inputUrl !== null) {
+      API.setBackendUrl(inputUrl);
+      if (statusText) statusText.textContent = 'Testing connection...';
+      const health = await API.checkHealth();
+      if (health.status === 'healthy' || health.status === 'online') {
+        alert("🎉 Successfully connected to CrimeVision AI Backend on Render!");
+      } else if (inputUrl.trim()) {
+        alert("⚠️ Backend URL saved! Note: Render free tier services sleep when inactive and may take 30-50 seconds to wake up on the first request.");
+      }
+      updateSystemHealth();
     }
   });
+
+  updateSystemHealth();
 
   // Pre-populate translations dictionary with defaults
   currentTranslations = {

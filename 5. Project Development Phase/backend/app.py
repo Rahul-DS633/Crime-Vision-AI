@@ -43,10 +43,18 @@ app.register_blueprint(audio_analysis_bp)
 app.register_blueprint(video_analysis_bp)
 app.register_blueprint(chat_bp)
 
-# Configures CORS so the frontend can talk to the backend
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+# Configures CORS so the Vercel frontend can talk to the Render backend
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 from config import API_CONFIG, BASE_DIR, DATA_DIR, UPLOAD_DIR
+
+@app.route('/health')
+def root_health():
+    return jsonify({
+        "status": "healthy",
+        "service": "CrimeVision AI Backend Gateway",
+        "version": "1.0.0"
+    }), 200
 
 @app.route('/data/<path:path>')
 def serve_data(path):

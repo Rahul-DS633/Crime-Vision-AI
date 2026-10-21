@@ -27,8 +27,8 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 API_CONFIG = {
     "host": "0.0.0.0",
-    "port": 5000,
-    "debug": True,
+    "port": int(os.getenv("PORT", 5000)),
+    "debug": os.getenv("FLASK_ENV") != "production",
     "cors_origins": "*"
 }
 

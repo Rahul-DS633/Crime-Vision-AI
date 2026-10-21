@@ -2,12 +2,18 @@
  * CrimeVision AI - API Client
  * High-reliability client with automatic fallback for cloud/Vercel deployments
  */
-const API_BASE_URL = (function() {
-  if (window.CRIMEVISION_API_URL) return window.CRIMEVISION_API_URL;
+function getApiBaseUrl() {
+  const savedUrl = localStorage.getItem('crimevision_backend_url');
+  if (savedUrl) return savedUrl.replace(/\/+$/, '') + '/api';
+  if (window.CRIMEVISION_API_URL) return window.CRIMEVISION_API_URL.replace(/\/+$/, '') + '/api';
   if (window.location.origin.includes(':5000')) return `${window.location.origin}/api`;
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return 'http://localhost:5000/api';
   return '/api';
-})();
+}
+
+const API_BASE_URL = {
+  toString: () => getApiBaseUrl()
+};
 
 class API {
   /**
@@ -302,9 +308,24 @@ class API {
     try {
       const response = await fetch(`${API_BASE_URL}/health`);
       if (!response.ok) return { status: 'offline' };
-      return await response.json();
+      const data = await response.json();
+      return { status: 'online', ...data };
     } catch (e) {
       return { status: 'demo_mode', message: 'CrimeVision AI running in Cloud Client Demo Mode' };
+    }
+  }
+
+  static getBackendUrl() {
+    return localStorage.getItem('crimevision_backend_url') || '';
+  }
+
+  static setBackendUrl(url) {
+    if (!url || !url.trim()) {
+      localStorage.removeItem('crimevision_backend_url');
+    } else {
+      let clean = url.trim().replace(/\/+$/, '');
+      if (clean.endsWith('/api')) clean = clean.slice(0, -4);
+      localStorage.setItem('crimevision_backend_url', clean);
     }
   }
 }
