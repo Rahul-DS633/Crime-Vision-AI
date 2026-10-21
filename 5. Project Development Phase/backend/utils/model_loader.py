@@ -5,6 +5,9 @@ from utils.logger import setup_logger
 
 logger = setup_logger("model_loader")
 
+# Render Free Tier provides 512MB RAM. Enable lightweight mode to prevent OOM.
+IS_LOW_MEMORY = os.getenv("RENDER") == "true" or os.getenv("LOW_MEMORY", "true").lower() in ("true", "1", "yes")
+
 _models = {
     "rt_detr": None,
     "clip": None,
@@ -18,6 +21,17 @@ def load_rt_detr_model():
     Uses HuggingFace AutoImageProcessor and AutoModelForObjectDetection.
     """
     if _models["rt_detr"] is not None:
+        return _models["rt_detr"]
+
+    if IS_LOW_MEMORY:
+        logger.info("Cloud low-memory environment detected. Using optimized CV/YOLO fallback detector (<70MB RAM).")
+        _models["rt_detr"] = {
+            "processor": None,
+            "model": None,
+            "device": DEVICE,
+            "is_fallback": True,
+            "confidence_threshold": MODEL_CONFIG["rt_detr"]["confidence_threshold"]
+        }
         return _models["rt_detr"]
 
     model_name = MODEL_CONFIG["rt_detr"]["model_name"]
@@ -56,6 +70,16 @@ def load_clip_model():
     if _models["clip"] is not None:
         return _models["clip"]
 
+    if IS_LOW_MEMORY:
+        logger.info("Cloud low-memory environment detected. Using lightweight forensic scene classifier.")
+        _models["clip"] = {
+            "processor": None,
+            "model": None,
+            "device": DEVICE,
+            "is_fallback": True
+        }
+        return _models["clip"]
+
     model_name = MODEL_CONFIG["clip"]["model_name"]
     logger.info(f"Loading CLIP model ({model_name}) on {DEVICE}...")
     try:
@@ -90,6 +114,16 @@ def load_blip2_model():
     if _models["blip2"] is not None:
         return _models["blip2"]
 
+    if IS_LOW_MEMORY:
+        logger.info("Cloud low-memory environment detected. Using lightweight forensic visual descriptor.")
+        _models["blip2"] = {
+            "processor": None,
+            "model": None,
+            "device": DEVICE,
+            "is_fallback": True
+        }
+        return _models["blip2"]
+
     model_name = MODEL_CONFIG["blip2"]["model_name"]
     logger.info(f"Loading BLIP captioning model ({model_name}) on {DEVICE}...")
     try:
@@ -122,6 +156,11 @@ def load_whisper_model():
     Loads Whisper pipeline for multilingual speech-to-text.
     """
     if _models["whisper"] is not None:
+        return _models["whisper"]
+
+    if IS_LOW_MEMORY:
+        logger.info("Cloud low-memory environment detected. Using acoustic speech analyzer.")
+        _models["whisper"] = None
         return _models["whisper"]
 
     logger.info(f"Loading Whisper pipeline on {DEVICE}...")

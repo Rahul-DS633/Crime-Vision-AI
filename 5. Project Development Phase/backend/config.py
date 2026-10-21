@@ -2,9 +2,6 @@ import os
 from pathlib import Path
 # pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
-# pyrefly: ignore [missing-import]
-import torch
-
 load_dotenv()
 
 # Base directories
@@ -22,8 +19,12 @@ REPORTS_DIR = DATA_DIR / "reports"
 for path in [DATA_DIR, UPLOAD_DIR, IMAGE_UPLOAD_DIR, AUDIO_UPLOAD_DIR, VIDEO_UPLOAD_DIR, SESSIONS_DIR, SAMPLES_DIR, REPORTS_DIR]:
     path.mkdir(parents=True, exist_ok=True)
 
-# Device configuration
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+try:
+    import torch
+    DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+except Exception:
+    torch = None
+    DEVICE = "cpu"
 
 API_CONFIG = {
     "host": "0.0.0.0",
