@@ -7,10 +7,12 @@ Performs OpenCV-based frame-by-frame computer vision detection of:
 - Complete 2D Bounding Boxes, 3D Spatial Trajectories, and Event Timeline
 """
 import os
+# pyrefly: ignore[missing-import]
 import cv2
 import math
 import time
-import numpy as np
+# pyrefly: ignore[missing-import]
+import numpy as np  
 from typing import List, Dict, Any, Tuple
 from utils.logger import setup_logger
 
